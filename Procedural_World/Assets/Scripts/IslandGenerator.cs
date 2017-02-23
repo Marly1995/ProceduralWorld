@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class IslandGenerator : MonoBehaviour {
 
-    public enum DrawMode { NoiseMap, ColorMap, Mesh };
+    public enum DrawMode { NoiseMap, ColorMap, Mesh, Terrain };
     public DrawMode drawMode;
 
     public int mapWidth, mapHeight;
@@ -49,6 +49,7 @@ public class IslandGenerator : MonoBehaviour {
         if (drawMode == DrawMode.NoiseMap) { display.DrawTexture(TextureGenerator.TextureFromHeightMap(noiseMap)); }
         else if (drawMode == DrawMode.ColorMap) { display.DrawTexture(TextureGenerator.TextureFromColorMap(colorMap, mapWidth, mapHeight)); }
         else if (drawMode == DrawMode.Mesh) { display.DrawMesh(MeshGenerator.GenerateTerrainMesh(noiseMap, meshHeightmultiplier), TextureGenerator.TextureFromColorMap(colorMap, mapWidth, mapHeight)); }
+        else if (drawMode == DrawMode.Terrain) { display.DrawTerrain(TerrainGenerator.GenerateTerrain(noiseMap, meshHeightmultiplier)); }
     }
 
     void OnValidate()

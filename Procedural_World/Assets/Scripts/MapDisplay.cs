@@ -8,6 +8,8 @@ public class MapDisplay : MonoBehaviour {
     public MeshFilter meshFilter;
     public MeshRenderer meshRenderer;
 
+    public Terrain terrain;
+
     public void DrawTexture(Texture2D texture)
     {
         textureRenderer.sharedMaterial.mainTexture = texture;
@@ -18,5 +20,10 @@ public class MapDisplay : MonoBehaviour {
     {
         meshFilter.sharedMesh = meshData.CreateMesh();
         meshRenderer.sharedMaterial.mainTexture = texture;
+    }
+
+    public void DrawTerrain(TerrainData terrainData)
+    {
+        terrain.terrainData = terrainData;
     }
 }
