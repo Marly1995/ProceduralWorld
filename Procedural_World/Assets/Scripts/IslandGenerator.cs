@@ -19,6 +19,7 @@ public class IslandGenerator : MonoBehaviour {
     public Vector2 offset;
 
     public float meshHeightmultiplier;
+    public AnimationCurve meshHeightCurve;
 
     public bool autoUpdate;
 
@@ -48,7 +49,7 @@ public class IslandGenerator : MonoBehaviour {
         MapDisplay display = FindObjectOfType<MapDisplay>();
         if (drawMode == DrawMode.NoiseMap) { display.DrawTexture(TextureGenerator.TextureFromHeightMap(noiseMap)); }
         else if (drawMode == DrawMode.ColorMap) { display.DrawTexture(TextureGenerator.TextureFromColorMap(colorMap, mapWidth, mapHeight)); }
-        else if (drawMode == DrawMode.Mesh) { display.DrawMesh(MeshGenerator.GenerateTerrainMesh(noiseMap, meshHeightmultiplier), TextureGenerator.TextureFromColorMap(colorMap, mapWidth, mapHeight)); }
+        else if (drawMode == DrawMode.Mesh) { display.DrawMesh(MeshGenerator.GenerateTerrainMesh(noiseMap, meshHeightmultiplier, meshHeightCurve), TextureGenerator.TextureFromColorMap(colorMap, mapWidth, mapHeight)); }
         else if (drawMode == DrawMode.Terrain) { display.DrawTerrain(TerrainGenerator.GenerateTerrain(noiseMap, meshHeightmultiplier)); }
     }
 

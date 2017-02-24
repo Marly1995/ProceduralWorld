@@ -29,9 +29,9 @@ public class TerrainGenerator
         Rocks.texture = RockTexture;
         Rocks.tileSize = new Vector2(4f, 4f);
 
-        terrainData.splatPrototypes = new SplatPrototype[] { Grass, Rocks };
-        terrainData.RefreshPrototypes();
-        terrainData.SetAlphamaps(0, 0, MakeSplatMap(terrainData));
+        //terrainData.splatPrototypes = new SplatPrototype[] { Grass, Rocks };
+        //terrainData.RefreshPrototypes();
+        //terrainData.SetAlphamaps(0, 0, MakeSplatMap(terrainData));
 
         return terrainData;
     }
