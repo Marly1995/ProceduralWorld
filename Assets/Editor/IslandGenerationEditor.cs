@@ -14,13 +14,13 @@ public class IslandGenerationEditor : Editor
         {
             if(islandGen.autoUpdate)
             {
-                islandGen.GenerateMap();
+                islandGen.DrawMapInEditor();
             }
         }
 
         if (GUILayout.Button ("Generate"))
         {
-            islandGen.GenerateMap();
+            islandGen.DrawMapInEditor();
         }
     }
 }
