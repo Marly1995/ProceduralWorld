@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent (typeof(MeshFilter), typeof(MeshRenderer))]
 public class sphereMapping : MonoBehaviour
 {
-    public int xSize, ySize;
+    public int xSize, ySize, zSize;
     private Vector3[] vertices;
     private Mesh mesh;
 
@@ -15,44 +15,72 @@ public class sphereMapping : MonoBehaviour
     }
 
     private void Generate()
-    {
-
+    {     
         GetComponent<MeshFilter>().mesh = mesh = new Mesh();
         mesh.name = "ProceduralMesh";
+        GenerateVerts();
+        GenerateTris();
+    }
 
-        vertices = new Vector3[(xSize + 1) * (ySize + 1)];
-        Vector2[] uv = new Vector2[vertices.Length];
-        Vector4[] tangents = new Vector4[vertices.Length];
+    private void GenerateVerts()
+    {
+        int cornerVerts = 8;
+        int edgeVerts = (xSize + ySize + zSize - 3) * 4;
+        int faceVerts = (
+            (xSize - 1) * (ySize - 1) +
+            (xSize - 1) * (zSize - 1) +
+            (ySize - 1) * (zSize - 1)) * 2;
+        vertices = new Vector3[cornerVerts + edgeVerts + faceVerts];
         int i = 0;
+        // rings 
         for (int y = 0; y <= ySize; y++)
         {
             for (int x = 0; x <= xSize; x++)
             {
-                vertices[i] = new Vector3(x, y);
-                uv[i] = new Vector2((float)x / xSize, (float)y / ySize);
-                tangents[i] = new Vector4(1.0f, 0.0f, 0.0f, -1.0f);
-                i++;
+                vertices[i++] = new Vector3(x, y, 0);
+            }
+            for (int z = 1; z <= zSize; z++)
+            {
+                vertices[i++] = new Vector3(xSize, y, z);
+            }
+            for (int x = xSize - 1; x >= 0; x--)
+            {
+                vertices[i++] = new Vector3(x, y, zSize);
+            }
+            for (int z = zSize - 1; z > 0; z--)
+            {
+                vertices[i++] = new Vector3(0, y, z);
+            }
+        }
+        // holes
+        for (int z = 1; z < zSize; z++)
+        {
+            for (int x = 1; x < xSize; x++)
+            {
+                vertices[i++] = new Vector3(x, ySize, z);
+            }
+        }
+        for (int z = 1; z < zSize; z++)
+        {
+            for (int x = 1; x < xSize; x++)
+            {
+                vertices[i++] = new Vector3(x, 0, z);
             }
         }
         mesh.vertices = vertices;
-        mesh.uv = uv;
-        mesh.tangents = tangents;
+    }
 
-        int[] triangles = new int[6*xSize*ySize];
-        for (int vert = 0, tri = 0, y = 0; y < ySize; y++, tri++)
-        {
-            for (int x = 0; x < xSize; x++, vert += 6, tri++)
-            {
-                triangles[vert] = tri;
-                triangles[vert + 1] = tri + xSize + 1;
-                triangles[vert + 2] = tri + 1;
-                triangles[vert + 3] = tri + 1;
-                triangles[vert + 4] = tri + xSize + 1;
-                triangles[vert + 5] = tri + xSize + 2;             
-            }
-        }
-        mesh.triangles = triangles;
-        mesh.RecalculateNormals();
+    private void GenerateTris()
+    {
+
+    }
+
+    private static void MakeQuad(int i, int v1, int v14, int v23, int v5)
+    {
+        triangles[i] = v1;
+        triangles[i + 1] = triangles[i + 4] = v14;
+        triangles[i + 2] = triangles[i + 3] = v23;
+        triangles[i + 5] = v5;
     }
 
     private void OnDrawGizmos()
