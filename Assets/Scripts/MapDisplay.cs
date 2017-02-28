@@ -22,6 +22,13 @@ public class MapDisplay : MonoBehaviour {
         meshRenderer.sharedMaterial.mainTexture = texture;
     }
 
+    public void DrawSphere(Mesh mesh)
+    {
+        mesh.RecalculateNormals();
+        meshFilter.sharedMesh = mesh;
+        //meshRenderer.sharedMaterial.mainTexture = texture;
+    }
+
     public void DrawTerrain(TerrainData terrainData)
     {
         terrain.terrainData = terrainData;

@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class IslandGenerator : MonoBehaviour {
 
-    public enum DrawMode { NoiseMap, ColorMap, Mesh, Terrain };
+    public enum DrawMode { NoiseMap, ColorMap, Mesh, Sphere };
     public DrawMode drawMode;
 
     public const int mapChunkSize = 241;
@@ -40,7 +40,7 @@ public class IslandGenerator : MonoBehaviour {
         if (drawMode == DrawMode.NoiseMap) { display.DrawTexture(TextureGenerator.TextureFromHeightMap(mapData.heightMap)); }
         else if (drawMode == DrawMode.ColorMap) { display.DrawTexture(TextureGenerator.TextureFromColorMap(mapData.colorMap, mapChunkSize, mapChunkSize)); }
         else if (drawMode == DrawMode.Mesh) { display.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData.heightMap, meshHeightmultiplier, meshHeightCurve, previewLOD), TextureGenerator.TextureFromColorMap(mapData.colorMap, mapChunkSize, mapChunkSize)); }
-        else if (drawMode == DrawMode.Terrain) { display.DrawTerrain(TerrainGenerator.GenerateTerrain(mapData.heightMap, meshHeightmultiplier)); }
+        else if (drawMode == DrawMode.Sphere) { display.DrawSphere(sphereMapping.getSphere(mapData.heightMap, meshHeightmultiplier, meshHeightCurve)); }
     }
 
     public void RequestMapData(Vector2 centre, Action<MapData> callback)

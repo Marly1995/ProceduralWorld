@@ -2,31 +2,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent (typeof(MeshFilter), typeof(MeshRenderer))]
-public class sphereMapping : MonoBehaviour
-{
-    public int gridSize;
-    [Range (0, 100)]
-    public float radius;
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+public class sphereMapping : MonoBehaviour {
 
-    private Vector3[] vertices;
-    private Vector3[] normals;
-    private Mesh mesh;
-
-    private void Awake()
+    public static Mesh getSphere(float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve)
     {
-        Generate();
+    int gridSize = 10;
+    float radius = 5;
+
+    return Generate(gridSize, radius, heightMap, heightMultiplier, _heightCurve);
     }
 
-    private void Generate()
-    {     
-        GetComponent<MeshFilter>().mesh = mesh = new Mesh();
-        mesh.name = "ProceduralPlanet";
-        GenerateVerts();
-        GenerateTris();
+    public static Mesh Generate(int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve)
+    {
+        Mesh mesh = new Mesh();
+
+        Mesh vertMesh = GenerateVerts(gridSize, radius, heightMap, heightMultiplier, _heightCurve);
+        Mesh triMesh = GenerateTris(gridSize, vertMesh.vertices);
+
+        mesh.vertices = vertMesh.vertices;
+        mesh.normals = vertMesh.normals;
+        mesh.subMeshCount = 3;
+        mesh.SetTriangles(triMesh.GetTriangles(0), 0);
+        mesh.SetTriangles(triMesh.GetTriangles(1), 1);
+        mesh.SetTriangles(triMesh.GetTriangles(2), 2);
+        return mesh;
     }
 
-    private void GenerateVerts()
+    private static Mesh GenerateVerts(int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve)
     {
         int cornerVerts = 8;
         int edgeVerts = (gridSize + gridSize + gridSize - 3) * 4;
@@ -34,27 +37,27 @@ public class sphereMapping : MonoBehaviour
             (gridSize - 1) * (gridSize - 1) +
             (gridSize - 1) * (gridSize - 1) +
             (gridSize - 1) * (gridSize - 1)) * 2;
-        vertices = new Vector3[cornerVerts + edgeVerts + faceVerts];
-        normals = new Vector3[vertices.Length];
+        Vector3[] vertices = new Vector3[cornerVerts + edgeVerts + faceVerts];
+        Vector3[] normals = new Vector3[vertices.Length];
         int i = 0;
         // rings 
         for (int y = 0; y <= gridSize; y++)
         {
             for (int x = 0; x <= gridSize; x++)
             {
-                SetVertex(i++, x, y, 0);
+                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y, 0);
             }
             for (int z = 1; z <= gridSize; z++)
             {
-                SetVertex(i++, gridSize, y, z);
+                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, gridSize, y, z);
             }
             for (int x = gridSize - 1; x >= 0; x--)
             {
-                SetVertex(i++, x, y, gridSize);
+                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y, gridSize);
             }
             for (int z = gridSize - 1; z > 0; z--)
             {
-                SetVertex(i++, 0, y, z);
+                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, 0, y, z);
             }
         }
         // holes
@@ -62,23 +65,25 @@ public class sphereMapping : MonoBehaviour
         {
             for (int x = 1; x < gridSize; x++)
             {
-                SetVertex(i++, x, gridSize, z);
+                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, gridSize, z);
             }
         }
         for (int z = 1; z < gridSize; z++)
         {
             for (int x = 1; x < gridSize; x++)
             {
-                SetVertex(i++, x, 0, z);
+                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, 0, z);
             }
         }
+        Mesh mesh = new Mesh();
         mesh.vertices = vertices;
         mesh.normals = normals;
+        return mesh;
     }
 
-    private void SetVertex(int i, int x, int y, int z)
+    private static void SetVertex(int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, Vector3[] normals, Vector3[] vertices, int i, int x, int y, int z)
     {
-        Vector3 v = new Vector3(x, y, z) * 2.0f/gridSize - Vector3.one;
+        Vector3 v = new Vector3(x, y * _heightCurve.Evaluate(heightMap[x, y]) * heightMultiplier, z) * 2.0f / gridSize - Vector3.one;
         float x2 = v.x * v.x;
         float y2 = v.y * v.y;
         float z2 = v.z * v.z;
@@ -90,7 +95,7 @@ public class sphereMapping : MonoBehaviour
         vertices[i] = normals[i] * radius;
     }
 
-    private void GenerateTris()
+    private static Mesh GenerateTris(int gridSize, Vector3[] vertices)
     {
         int[] trianglesZ = new int[(gridSize * gridSize) * 12];
         int[] trianglesX = new int[(gridSize * gridSize) * 12];
@@ -119,16 +124,19 @@ public class sphereMapping : MonoBehaviour
             tX = MakeQuad(trianglesX, tX, v, v - ring + 1, v + ring, v + 1);
         }
 
-        tY = CreateBoxTop(trianglesY, tY, ring);
-        tY = CreateBoxBot(trianglesY, tY, ring);
+        tY = CreateBoxTop(gridSize, trianglesY, tY, ring);        
+        tY = CreateBoxBot(gridSize, vertices, trianglesY, tY, ring);
+        
+        Mesh mesh = new Mesh();
+        mesh.vertices = vertices;
         mesh.subMeshCount = 3;
         mesh.SetTriangles(trianglesZ, 0);
         mesh.SetTriangles(trianglesX, 1);
         mesh.SetTriangles(trianglesY, 2);
-        mesh.RecalculateNormals();
+        return mesh;
     }
 
-    private int CreateBoxTop(int[] triangles, int t, int ring)
+    private static int CreateBoxTop(int gridSize, int[] triangles, int t, int ring)
     {
         int v = ring * gridSize;
         for (int x = 0; x < gridSize - 1; x++, v++)
@@ -164,7 +172,7 @@ public class sphereMapping : MonoBehaviour
         return t;
     }
 
-    private int CreateBoxBot(int[] triangles, int t, int ring)
+    private static int CreateBoxBot(int gridSize, Vector3[] vertices, int[] triangles, int t, int ring)
     {
         int v = 1;
         int vMid = vertices.Length - (gridSize - 1) * (gridSize - 1);
@@ -174,7 +182,7 @@ public class sphereMapping : MonoBehaviour
             t = MakeQuad(triangles, t, vMid, vMid + 1, v, v + 1);
         }
         t = MakeQuad(triangles, t, vMid, v + 2, v, v + 1);
-
+                
         int vMin = ring - 2;
         vMid -= gridSize - 2;
         int vMax = v + 2;
@@ -213,7 +221,7 @@ public class sphereMapping : MonoBehaviour
 
     //private void OnDrawGizmos()
     //{
-    //    if(vertices == null)
+    //    if (vertices == null)
     //    {
     //        return;
     //    }
