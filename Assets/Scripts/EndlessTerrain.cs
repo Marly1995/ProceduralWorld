@@ -17,7 +17,7 @@ public class EndlessTerrain : MonoBehaviour {
     int chunksVisible;
 
     Dictionary<Vector2, TerrainChunk> terrainChunkDictionary = new Dictionary<Vector2, TerrainChunk>();
-    List<TerrainChunk> visibleChunks = new List<TerrainChunk>();
+    static List<TerrainChunk> visibleChunks = new List<TerrainChunk>();
 
     void Start()
     {
@@ -54,11 +54,7 @@ public class EndlessTerrain : MonoBehaviour {
 
                 if (terrainChunkDictionary.ContainsKey (viewedChunkCoord))
                 {
-                    terrainChunkDictionary[viewedChunkCoord].UpdateTerrainChunk();
-                    if(terrainChunkDictionary[viewedChunkCoord].IsVisible())
-                    {
-                        visibleChunks.Add(terrainChunkDictionary[viewedChunkCoord]);
-                    }
+                    terrainChunkDictionary[viewedChunkCoord].UpdateTerrainChunk();                   
                 }
                 else
                 {
@@ -104,16 +100,21 @@ public class EndlessTerrain : MonoBehaviour {
             meshLods = new LodMesh[detailLevels.Length];
             for (int i = 0; i < detailLevels.Length; i++)
             {
-                meshLods[i] = new LodMesh(detailLevels[i].lod);
+                meshLods[i] = new LodMesh(detailLevels[i].lod, UpdateTerrainChunk);
             }
 
-            islandGen.RequestMapData(OnMapDataRecieved);
+            islandGen.RequestMapData(position, OnMapDataRecieved);
         }
 
         void OnMapDataRecieved(MapData mapData)
         {
             this.mapData = mapData;
             mapDataRecieved = true;
+
+            Texture2D texture = TextureGenerator.TextureFromColorMap(mapData.colorMap, IslandGenerator.mapChunkSize, IslandGenerator.mapChunkSize);
+            meshRenderer.material.mainTexture = texture;
+
+            UpdateTerrainChunk();
         }
 
         public void UpdateTerrainChunk()
@@ -148,6 +149,7 @@ public class EndlessTerrain : MonoBehaviour {
                             lodMesh.RequestMesh(mapData);
                         }
                     }
+                    visibleChunks.Add(this);
                 }
                 SetVisible(visible);
             }
@@ -172,15 +174,20 @@ public class EndlessTerrain : MonoBehaviour {
         public bool hasMesh;
         int lod;
 
-        public LodMesh(int lod)
+        System.Action updateCallback;
+
+        public LodMesh(int lod, System.Action updateCallback)
         {
             this.lod = lod;
+            this.updateCallback = updateCallback;
         }
 
         void OnMeshDataRecieved(MeshData meshData)
         {
             mesh = meshData.CreateMesh();
             hasMesh = true;
+
+            updateCallback();
         }
 
         public void RequestMesh(MapData mapData)

@@ -34,7 +34,7 @@ public class IslandGenerator : MonoBehaviour {
 
     public void DrawMapInEditor()
     {
-        MapData mapData = GenerateMapData();
+        MapData mapData = GenerateMapData(Vector2.zero);
 
         MapDisplay display = FindObjectOfType<MapDisplay>();
         if (drawMode == DrawMode.NoiseMap) { display.DrawTexture(TextureGenerator.TextureFromHeightMap(mapData.heightMap)); }
@@ -43,19 +43,19 @@ public class IslandGenerator : MonoBehaviour {
         else if (drawMode == DrawMode.Terrain) { display.DrawTerrain(TerrainGenerator.GenerateTerrain(mapData.heightMap, meshHeightmultiplier)); }
     }
 
-    public void RequestMapData(Action<MapData> callback)
+    public void RequestMapData(Vector2 centre, Action<MapData> callback)
     {
         ThreadStart threadStart = delegate
         {
-            MapDataThread(callback);
+            MapDataThread(centre, callback);
         };
 
         new Thread(threadStart).Start();
     }
 
-    void MapDataThread(Action<MapData> callback)
+    void MapDataThread(Vector2 centre, Action<MapData> callback)
     {
-        MapData mapData = GenerateMapData();
+        MapData mapData = GenerateMapData(centre);
         lock (mapDataThreadQueue)
         {
             mapDataThreadQueue.Enqueue(new MapThreadInfo<MapData>(callback, mapData));
@@ -101,9 +101,9 @@ public class IslandGenerator : MonoBehaviour {
         }
     }
 
-    MapData GenerateMapData()
+    MapData GenerateMapData(Vector2 centre)
     {
-        float[,] noiseMap = NoiseGeneration.GenerateNoiseMap(mapChunkSize, mapChunkSize, seed, noiseScale, sheets, persistance, lacunarity, offset);
+        float[,] noiseMap = NoiseGeneration.GenerateNoiseMap(mapChunkSize, mapChunkSize, seed, noiseScale, sheets, persistance, lacunarity, centre + offset);
 
 
         Color[] colorMap = new Color[mapChunkSize * mapChunkSize];

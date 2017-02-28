@@ -4,18 +4,28 @@ using UnityEngine;
 
 public static class NoiseGeneration
 {
-    public static float[,] GenerateNoiseMap(int mapWidth, int mapHeight, int seed, float scale, int sheets, float persistance, float lacunarity, Vector2 offset)
+    public enum NormailizeMode { Local, Global };
+
+    public static float[,] GenerateNoiseMap(int mapWidth, int mapHeight, int seed, float scale, int sheets, float persistance, float lacunarity, Vector2 offset, NormailizeMode normalizeMode)
     {
         float[,] noiseMap = new float[mapWidth, mapHeight];
 
         System.Random rndGen = new System.Random(seed);
 
         Vector2[] sheetOffsets = new Vector2[sheets];
+
+        float maxPossibleHeight = 0;
+        float amplitude = 1.0f;
+        float frequency = 1.0f;
+
         for (int i = 0; i < sheets; i++)
         {
             float offsetX = rndGen.Next(-100000, 100000) + offset.x;
-            float offsetY = rndGen.Next(-100000, 100000) + offset.y;
+            float offsetY = rndGen.Next(-100000, 100000) - offset.y;
             sheetOffsets[i] = new Vector2(offsetX, offsetY);
+
+            maxPossibleHeight += amplitude;
+            amplitude *= persistance;
         }
 
         if (scale <= 0)
@@ -33,14 +43,14 @@ public static class NoiseGeneration
         {
             for (int x = 0; x < mapWidth; x++)
             {
-                float amplitude = 1.0f;
-                float frequency = 1.0f;
+                amplitude = 1.0f;
+                frequency = 1.0f;
                 float noiseHeight = 0.0f;
 
                 for (int i = 0; i < sheets; i++)
                 {
-                    float sampleX = x / scale * frequency + sheetOffsets[i].x;
-                    float sampleY = y / scale * frequency + sheetOffsets[i].y;
+                    float sampleX = (x - halfWidth + sheetOffsets[i].x) / scale * frequency;
+                    float sampleY = (y - halfHeight + sheetOffsets[i].y) / scale * frequency;
 
                     float perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
                     noiseHeight += perlinValue * amplitude;
@@ -65,7 +75,10 @@ public static class NoiseGeneration
         {
             for (int x = 0; x < mapWidth; x++)
             {
-                noiseMap[x, y] = Mathf.InverseLerp(minNoiseHeight, maxNoiseHeight, noiseMap[x, y]);
+                if (normalizeMode == NormailizeMode.Local)
+                {
+                    noiseMap[x, y] = Mathf.InverseLerp(minNoiseHeight, maxNoiseHeight, noiseMap[x, y]);
+                }
             }
         }
         return noiseMap;
