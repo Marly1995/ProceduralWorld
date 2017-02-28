@@ -7,7 +7,7 @@ public class sphereMapping : MonoBehaviour {
 
     public static Mesh getSphere(float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve)
     {
-    int gridSize = 10;
+    int gridSize = 50;
     float radius = 5;
 
     return Generate(gridSize, radius, heightMap, heightMultiplier, _heightCurve);
@@ -83,7 +83,7 @@ public class sphereMapping : MonoBehaviour {
 
     private static void SetVertex(int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, Vector3[] normals, Vector3[] vertices, int i, int x, int y, int z)
     {
-        Vector3 v = new Vector3(x, y * _heightCurve.Evaluate(heightMap[x, y]) * heightMultiplier, z) * 2.0f / gridSize - Vector3.one;
+        Vector3 v = new Vector3(x, y, z) * 2.0f / gridSize - Vector3.one;
         float x2 = v.x * v.x;
         float y2 = v.y * v.y;
         float z2 = v.z * v.z;
@@ -92,7 +92,7 @@ public class sphereMapping : MonoBehaviour {
         s.y = v.y * Mathf.Sqrt(1f - x2 / 2f - z2 / 2f + x2 * z2 / 3f);
         s.z = v.z * Mathf.Sqrt(1f - x2 / 2f - y2 / 2f + x2 * y2 / 3f);
         normals[i] = s.normalized;
-        vertices[i] = normals[i] * radius;
+        vertices[i] = normals[i] * (radius + _heightCurve.Evaluate(heightMap[x, y]) * heightMultiplier);
     }
 
     private static Mesh GenerateTris(int gridSize, Vector3[] vertices)
