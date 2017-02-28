@@ -109,23 +109,39 @@ public class sphereMapping : MonoBehaviour
 
     private void GenerateTris()
     {
-        int quads = (xSize * ySize + xSize * zSize + ySize * zSize) * 2;
-        int[] triangles = new int[quads * 6];
+        int[] trianglesZ = new int[(xSize * ySize) * 12];
+        int[] trianglesX = new int[(ySize * zSize) * 12];
+        int[] trianglesY = new int[(xSize * zSize) * 12];
         int ring = (xSize + zSize) * 2;
-        int t = 0, v = 0;
+        int tZ = 0, tX = 0, tY = 0, v = 0;
 
         for (int y = 0; y < ySize; y++, v++)
         {
-            for (int q = 0; q < ring - 1; q++, v++)
+            for (int q = 0; q < xSize; q++, v++)
             {
-                t = MakeQuad(triangles, t, v, v + 1, v + ring, v + ring + 1);
+                tZ = MakeQuad(trianglesZ, tZ, v, v + 1, v + ring, v + ring + 1);
             }
-            t = MakeQuad(triangles, t, v, v - ring + 1, v + ring, v + 1);
+            for (int q = 0; q < zSize; q++, v++)
+            {
+                tX = MakeQuad(trianglesX, tX, v, v + 1, v + ring, v + ring + 1);
+            }
+            for (int q = 0; q < xSize; q++, v++)
+            {
+                tZ = MakeQuad(trianglesZ, tZ, v, v + 1, v + ring, v + ring + 1);
+            }
+            for (int q = 0; q < zSize - 1; q++, v++)
+            {
+                tX = MakeQuad(trianglesX, tX, v, v + 1, v + ring, v + ring + 1);
+            }
+            tX = MakeQuad(trianglesX, tX, v, v - ring + 1, v + ring, v + 1);
         }
 
-        t = CreateBoxTop(triangles, t, ring);
-        t = CreateBoxBot(triangles, t, ring);
-        mesh.triangles = triangles;
+        tY = CreateBoxTop(trianglesY, tY, ring);
+        tY = CreateBoxBot(trianglesY, tY, ring);
+        mesh.subMeshCount = 3;
+        mesh.SetTriangles(trianglesZ, 0);
+        mesh.SetTriangles(trianglesX, 1);
+        mesh.SetTriangles(trianglesY, 2);
         mesh.RecalculateNormals();
     }
 
@@ -212,20 +228,20 @@ public class sphereMapping : MonoBehaviour
         return i + 6;
     }
 
-    private void OnDrawGizmos()
-    {
-        if(vertices == null)
-        {
-            return;
-        }
+    //private void OnDrawGizmos()
+    //{
+    //    if(vertices == null)
+    //    {
+    //        return;
+    //    }
 
-        Gizmos.color = Color.black;
-        for (int i = 0; i < vertices.Length; i++)
-        {
-            Gizmos.color = Color.black;
-            Gizmos.DrawSphere(vertices[i], 0.1f);
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawRay(vertices[i], normals[i]);
-        }
-    }
+    //    Gizmos.color = Color.black;
+    //    for (int i = 0; i < vertices.Length; i++)
+    //    {
+    //        Gizmos.color = Color.black;
+    //        Gizmos.DrawSphere(vertices[i], 0.1f);
+    //        Gizmos.color = Color.yellow;
+    //        Gizmos.DrawRay(vertices[i], normals[i]);
+    //    }
+    //}
 }

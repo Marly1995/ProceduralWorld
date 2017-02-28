@@ -6,7 +6,7 @@ public static class NoiseGeneration
 {
     public enum NormailizeMode { Local, Global };
 
-    public static float[,] GenerateNoiseMap(int mapWidth, int mapHeight, int seed, float scale, int sheets, float persistance, float lacunarity, Vector2 offset, NormailizeMode normalizeMode)
+    public static float[,] GenerateNoiseMap(int mapWidth, int mapHeight, int seed, float scale, int sheets, float persistance, float lacunarity, Vector2 offset)//, NormailizeMode normalizeMode)
     {
         float[,] noiseMap = new float[mapWidth, mapHeight];
 
@@ -75,7 +75,7 @@ public static class NoiseGeneration
         {
             for (int x = 0; x < mapWidth; x++)
             {
-                if (normalizeMode == NormailizeMode.Local)
+                //if (normalizeMode == NormailizeMode.Local)
                 {
                     noiseMap[x, y] = Mathf.InverseLerp(minNoiseHeight, maxNoiseHeight, noiseMap[x, y]);
                 }
