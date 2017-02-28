@@ -94,6 +94,14 @@ public class sphereMapping : MonoBehaviour
         {
             inner.y = ySize - roundness;
         }
+        if (z < roundness)
+        {
+            inner.z = roundness;
+        }
+        else if (z > zSize - roundness)
+        {
+            inner.z = zSize - roundness;
+        }
 
         normals[i] = (vertices[i] - inner).normalized;
         vertices[i] = inner + normals[i] * roundness;
