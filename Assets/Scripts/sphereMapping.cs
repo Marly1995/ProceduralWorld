@@ -39,28 +39,25 @@ public class sphereMapping : MonoBehaviour {
             (gridSize - 1) * (gridSize - 1)) * 2;
         Vector3[] vertices = new Vector3[cornerVerts + edgeVerts + faceVerts];
         Vector3[] normals = new Vector3[vertices.Length];
-		float[,] noiseMap = NoiseGeneration.GenerateNoiseMap(gridSize * 4, gridSize * 4, 0, 40, 5, 0.4f, 2.1f, Vector2.zero);
-		float[,] noiseMap2 = NoiseGeneration.GenerateNoiseMap(gridSize * 4, gridSize * 4, 10, 40, 5, 0.4f, 2.1f, Vector2.zero);
-		float[,] noiseMap3 = NoiseGeneration.GenerateNoiseMap(gridSize * 4, gridSize * 4, 20, 40, 5, 0.4f, 2.1f, Vector2.zero);
 		int i = 0;
         // rings 
         for (int y = 0; y <= gridSize; y++)
         {
             for (int x = 0; x <= gridSize; x++)
             {
-                SetVertex(gridSize, radius, noiseMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y, 0, y, x);
+                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y, 0, y, x);
             }
             for (int z = 1; z <= gridSize; z++)
             {
-                SetVertex(gridSize, radius, noiseMap3, heightMultiplier, _heightCurve, normals, vertices, i++, gridSize, y, z, z, y);
+                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, gridSize, y, z, z, y);
             }
             for (int x = gridSize - 1; x >= 0; x--)
             {
-                SetVertex(gridSize, radius, noiseMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y, gridSize, y, x);
+                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y, gridSize, y, x);
             }
             for (int z = gridSize - 1; z > 0; z--)
             {
-                SetVertex(gridSize, radius, noiseMap3, heightMultiplier, _heightCurve, normals, vertices, i++, 0, y, z, z, y);
+                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, 0, y, z, z, y);
             }
         }
         // holes
@@ -68,14 +65,14 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int x = 1; x < gridSize; x++)
             {
-                SetVertex(gridSize, radius, noiseMap2, heightMultiplier, _heightCurve, normals, vertices, i++, x, gridSize, z, z, x);
+                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, gridSize, z, z, x);
             }
         }
         for (int z = 1; z < gridSize; z++)
         {
             for (int x = 1; x < gridSize; x++)
             {
-                SetVertex(gridSize, radius, noiseMap2, heightMultiplier, _heightCurve, normals, vertices, i++, x, 0, z, z, x);
+                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, 0, z, z, x);
             }
         }
         Mesh mesh = new Mesh();
