@@ -39,25 +39,28 @@ public class sphereMapping : MonoBehaviour {
             (gridSize - 1) * (gridSize - 1)) * 2;
         Vector3[] vertices = new Vector3[cornerVerts + edgeVerts + faceVerts];
         Vector3[] normals = new Vector3[vertices.Length];
-        int i = 0;
+		float[,] noiseMap = NoiseGeneration.GenerateNoiseMap(gridSize * 4, gridSize * 4, 0, 40, 5, 0.4f, 2.1f, Vector2.zero);
+		float[,] noiseMap2 = NoiseGeneration.GenerateNoiseMap(gridSize * 4, gridSize * 4, 10, 40, 5, 0.4f, 2.1f, Vector2.zero);
+		float[,] noiseMap3 = NoiseGeneration.GenerateNoiseMap(gridSize * 4, gridSize * 4, 20, 40, 5, 0.4f, 2.1f, Vector2.zero);
+		int i = 0;
         // rings 
         for (int y = 0; y <= gridSize; y++)
         {
             for (int x = 0; x <= gridSize; x++)
             {
-                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y, 0);
+                SetVertex(gridSize, radius, noiseMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y, 0, y, x);
             }
             for (int z = 1; z <= gridSize; z++)
             {
-                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, gridSize, y, z);
+                SetVertex(gridSize, radius, noiseMap3, heightMultiplier, _heightCurve, normals, vertices, i++, gridSize, y, z, z, y);
             }
             for (int x = gridSize - 1; x >= 0; x--)
             {
-                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y, gridSize);
+                SetVertex(gridSize, radius, noiseMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y, gridSize, y, x);
             }
             for (int z = gridSize - 1; z > 0; z--)
             {
-                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, 0, y, z);
+                SetVertex(gridSize, radius, noiseMap3, heightMultiplier, _heightCurve, normals, vertices, i++, 0, y, z, z, y);
             }
         }
         // holes
@@ -65,14 +68,14 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int x = 1; x < gridSize; x++)
             {
-                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, gridSize, z);
+                SetVertex(gridSize, radius, noiseMap2, heightMultiplier, _heightCurve, normals, vertices, i++, x, gridSize, z, z, x);
             }
         }
         for (int z = 1; z < gridSize; z++)
         {
             for (int x = 1; x < gridSize; x++)
             {
-                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, 0, z);
+                SetVertex(gridSize, radius, noiseMap2, heightMultiplier, _heightCurve, normals, vertices, i++, x, 0, z, z, x);
             }
         }
         Mesh mesh = new Mesh();
@@ -81,9 +84,9 @@ public class sphereMapping : MonoBehaviour {
         return mesh;
     }
 
-    private static void SetVertex(int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, Vector3[] normals, Vector3[] vertices, int i, int x, int y, int z)
+    private static void SetVertex(int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, Vector3[] normals, Vector3[] vertices, int i, int x, int y, int z, int xy, int xz)
     {
-        Vector3 v = new Vector3(x, y, z) * 2.0f / gridSize - Vector3.one;
+		Vector3 v = new Vector3(x, y, z) * 2.0f / gridSize - Vector3.one;
         float x2 = v.x * v.x;
         float y2 = v.y * v.y;
         float z2 = v.z * v.z;
@@ -91,8 +94,8 @@ public class sphereMapping : MonoBehaviour {
         s.x = v.x * Mathf.Sqrt(1f - y2 / 2f - z2 / 2f + y2 * z2 / 3f);
         s.y = v.y * Mathf.Sqrt(1f - x2 / 2f - z2 / 2f + x2 * z2 / 3f);
         s.z = v.z * Mathf.Sqrt(1f - x2 / 2f - y2 / 2f + x2 * y2 / 3f);
-        normals[i] = s.normalized;
-        vertices[i] = normals[i] * (radius + _heightCurve.Evaluate(heightMap[x, y]) * heightMultiplier);
+		normals[i] = s.normalized;
+        vertices[i] = normals[i] * (radius + _heightCurve.Evaluate(heightMap[xz, xy]) * heightMultiplier);
     }
 
     private static Mesh GenerateTris(int gridSize, Vector3[] vertices)
