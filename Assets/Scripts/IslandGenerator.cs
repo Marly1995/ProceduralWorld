@@ -10,8 +10,12 @@ public class IslandGenerator : MonoBehaviour {
     public DrawMode drawMode;
 
     public const int mapChunkSize = 241;
-    [Range(0,6)]
-    public int previewLOD;
+
+	[Range(1,3)]
+	public int divisions;
+	[Range(10,50)]
+	public int gridSize;
+	
     public float noiseScale;
 
     public int sheets;
@@ -34,13 +38,17 @@ public class IslandGenerator : MonoBehaviour {
 
     public void DrawMapInEditor()
     {
-        MapData mapData = GenerateMapData(Vector2.zero);
+		MapData[] mapData = new MapData[6*(int)Math.Pow(4, divisions)];
+		for (int i = 0; i < 6*(int)Math.Pow(4, divisions); i++)
+		{
+			mapData[i] = GenerateMapData(Vector2.zero, new Vector2(gridSize*i, 0));
+		}
 
         MapDisplay display = FindObjectOfType<MapDisplay>();
-        if (drawMode == DrawMode.NoiseMap) { display.DrawTexture(TextureGenerator.TextureFromHeightMap(mapData.heightMap)); }
-        else if (drawMode == DrawMode.ColorMap) { display.DrawTexture(TextureGenerator.TextureFromColorMap(mapData.colorMap, mapChunkSize, mapChunkSize)); }
-        else if (drawMode == DrawMode.Mesh) { display.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData.heightMap, meshHeightmultiplier, meshHeightCurve, previewLOD), TextureGenerator.TextureFromColorMap(mapData.colorMap, mapChunkSize, mapChunkSize)); }
-        else if (drawMode == DrawMode.Sphere) { display.DrawSphere(sphereMapping.getSphere(mapData.heightMap, meshHeightmultiplier, meshHeightCurve)); }
+        if (drawMode == DrawMode.NoiseMap) { display.DrawTexture(TextureGenerator.TextureFromHeightMap(mapData[0].heightMap)); }
+        else if (drawMode == DrawMode.ColorMap) { display.DrawTexture(TextureGenerator.TextureFromColorMap(mapData[0].colorMap, mapChunkSize, mapChunkSize)); }
+        //else if (drawMode == DrawMode.Mesh) { display.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData[0].heightMap, meshHeightmultiplier, meshHeightCurve, previewLOD), TextureGenerator.TextureFromColorMap(mapData.colorMap, mapChunkSize, mapChunkSize)); }
+        else if (drawMode == DrawMode.Sphere) { display.DrawSphere(sphereMapping.getSphere(gridSize, mapData, meshHeightmultiplier, meshHeightCurve)); }
     }
 
     public void RequestMapData(Vector2 centre, Action<MapData> callback)
@@ -55,7 +63,7 @@ public class IslandGenerator : MonoBehaviour {
 
     void MapDataThread(Vector2 centre, Action<MapData> callback)
     {
-        MapData mapData = GenerateMapData(centre);
+        MapData mapData = GenerateMapData(centre, centre);
         lock (mapDataThreadQueue)
         {
             mapDataThreadQueue.Enqueue(new MapThreadInfo<MapData>(callback, mapData));
@@ -101,7 +109,7 @@ public class IslandGenerator : MonoBehaviour {
         }
     }
 
-    MapData GenerateMapData(Vector2 centre)
+    MapData GenerateMapData(Vector2 centre, Vector2 inc)
     {
         float[,] noiseMap = NoiseGeneration.GenerateNoiseMap(mapChunkSize, mapChunkSize, seed, noiseScale, sheets, persistance, lacunarity, centre + offset);
 
