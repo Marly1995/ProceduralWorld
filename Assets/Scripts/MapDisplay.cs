@@ -5,8 +5,8 @@ using UnityEngine;
 public class MapDisplay : MonoBehaviour {
 
     public Renderer textureRenderer;
-    public MeshFilter meshFilter;
-    public MeshRenderer meshRenderer;
+    public MeshFilter[] meshFilter = new MeshFilter[6];
+    public MeshRenderer[] meshRenderer = new MeshRenderer[6];
 
     public Terrain terrain;
 
@@ -18,15 +18,18 @@ public class MapDisplay : MonoBehaviour {
 
     public void DrawMesh(MeshData meshData, Texture2D texture)
     {
-        meshFilter.sharedMesh = meshData.CreateMesh();
-        meshRenderer.sharedMaterial.mainTexture = texture;
+        //meshFilter.sharedMesh = meshData.CreateMesh();
+        //meshRenderer.sharedMaterial.mainTexture = texture;
     }
 
-    public void DrawSphere(Mesh mesh)
+    public void DrawSphere(Mesh[] mesh)
     {
-        mesh.RecalculateNormals();
-        meshFilter.sharedMesh = mesh;
-        //meshRenderer.sharedMaterial.mainTexture = texture;
+        for (int i = 0; i < 6; i++)
+        {
+            mesh[i].RecalculateNormals();
+            meshFilter[i].sharedMesh = mesh[i];
+            //meshRenderer.sharedMaterial.mainTexture = texture;
+        }
     }
 
     public void DrawTerrain(TerrainData terrainData)

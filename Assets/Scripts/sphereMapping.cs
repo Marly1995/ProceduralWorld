@@ -5,23 +5,23 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class sphereMapping : MonoBehaviour {
 
-    public static Mesh getSphere(int gridSize, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve)
+    public static Mesh[] getSphere(int divs, int gridSize, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve)
     {
     float radius = 5;
 
-    return Generate(gridSize, radius, heightMap, heightMultiplier, _heightCurve);
+    return Generate(divs, gridSize, radius, heightMap, heightMultiplier, _heightCurve);
     }
 
-    public static Mesh Generate(int gridSize, float radius, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve)
+    public static Mesh[] Generate(int divs, int gridSize, float radius, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve)
     {
-        Mesh mesh = new Mesh();
+        Mesh[] mesh = new Mesh[6];
 
-        Mesh vertMesh = GenerateVerts(gridSize, radius, heightMap, heightMultiplier, _heightCurve);
-        Mesh triMesh = GenerateTris(gridSize, vertMesh.vertices);
+        Mesh vertMesh = GenerateVerts(divs, gridSize, radius, heightMap, heightMultiplier, _heightCurve);
+        Mesh triMesh = GenerateTris(gridSize, vertMesh.vertices, divs);
 
         mesh.vertices = vertMesh.vertices;
         mesh.normals = vertMesh.normals;
-        mesh.subMeshCount = heightMap.Length;
+        mesh.subMeshCount = heightMap.Length*divs;
 		for (int i = 0; i < heightMap.Length; i++)
 		{
 			mesh.SetTriangles(triMesh.GetTriangles(i), i);
@@ -29,50 +29,51 @@ public class sphereMapping : MonoBehaviour {
         return mesh;
     }
 
-    private static Mesh GenerateVerts(int gridSize, float radius, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve)
+    private static Mesh GenerateVerts(int divs, int gridSize, float radius, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve)
     {
+        int gridNum = divs * gridSize;
         int cornerVerts = 8;
-        int edgeVerts = (gridSize + gridSize + gridSize - 3) * 4;
+        int edgeVerts = (gridNum + gridNum + gridNum - 3) * 4;
         int faceVerts = (
-            (gridSize - 1) * (gridSize - 1) +
-            (gridSize - 1) * (gridSize - 1) +
-            (gridSize - 1) * (gridSize - 1)) * 2;
+            (gridNum - 1) * (gridNum - 1) +
+            (gridNum - 1) * (gridNum - 1) +
+            (gridNum - 1) * (gridNum - 1)) * 2;
         Vector3[] vertices = new Vector3[cornerVerts + edgeVerts + faceVerts];
         Vector3[] normals = new Vector3[vertices.Length];
-		int i = 0;
+		int i = 0;        
         // rings 
-        for (int y = 0; y <= gridSize; y++)
+        for (int y = 0; y <= gridNum; y++)
         {
-            for (int x = 0; x <= gridSize; x++)
-            {
-                SetVertex(gridSize, radius, heightMap[0].heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y, 0, y, x);
+            for (int x = 0; x <= gridNum; x++)
+            {               
+                SetVertex(gridNum, radius, heightMap[0].heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y, 0, y, x);
             }
-            for (int z = 1; z <= gridSize; z++)
+            for (int z = 1; z <= gridNum; z++)
             {
-                SetVertex(gridSize, radius, heightMap[1].heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, gridSize, y, z, z, y+gridSize);
+                SetVertex(gridNum, radius, heightMap[1].heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, gridNum, y, z, z, y);
             }
-            for (int x = gridSize - 1; x >= 0; x--)
+            for (int x = gridNum - 1; x >= 0; x--)
             {
-                SetVertex(gridSize, radius, heightMap[2].heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y, gridSize, y, x+gridSize*2);
+                SetVertex(gridNum, radius, heightMap[2].heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y, gridNum, y, x);
             }
-            for (int z = gridSize - 1; z > 0; z--)
+            for (int z = gridNum - 1; z > 0; z--)
             {
-                SetVertex(gridSize, radius, heightMap[3].heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, 0, y, z, z, y+gridSize*3);
-            }
+                SetVertex(gridNum, radius, heightMap[3].heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, 0, y, z, z, y);
+            }           
         }
         // holes
-        for (int z = 1; z < gridSize; z++)
+        for (int z = 1; z < gridNum; z++)
         {
-            for (int x = 1; x < gridSize; x++)
+            for (int x = 1; x < gridNum; x++)
             {
-                SetVertex(gridSize, radius, heightMap[4].heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, gridSize, z, z+gridSize, x);
+                SetVertex(gridNum, radius, heightMap[4].heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, gridNum, z, z, x);
             }
         }
-        for (int z = 1; z < gridSize; z++)
+        for (int z = 1; z < gridNum; z++)
         {
-            for (int x = 1; x < gridSize; x++)
+            for (int x = 1; x < gridNum; x++)
             {
-                SetVertex(gridSize, radius, heightMap[5].heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, 0, z, z+gridSize*2, x);
+                SetVertex(gridNum, radius, heightMap[5].heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, 0, z, z, x);
             }
         }
         Mesh mesh = new Mesh();
@@ -82,8 +83,8 @@ public class sphereMapping : MonoBehaviour {
     }
 
     private static void SetVertex(int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, Vector3[] normals, Vector3[] vertices, int i, int x, int y, int z, int xy, int xz)
-    {
-		Vector3 v = new Vector3(x, y, z) * 2.0f / gridSize - Vector3.one;
+    {       
+        Vector3 v = new Vector3(x, y, z) * 2.0f / gridSize - Vector3.one;
         float x2 = v.x * v.x;
         float y2 = v.y * v.y;
         float z2 = v.z * v.z;
@@ -91,54 +92,58 @@ public class sphereMapping : MonoBehaviour {
         s.x = v.x * Mathf.Sqrt(1f - y2 / 2f - z2 / 2f + y2 * z2 / 3f);
         s.y = v.y * Mathf.Sqrt(1f - x2 / 2f - z2 / 2f + x2 * z2 / 3f);
         s.z = v.z * Mathf.Sqrt(1f - x2 / 2f - y2 / 2f + x2 * y2 / 3f);
-		normals[i] = s.normalized;
+		normals[i] = s.normalized;       
         vertices[i] = normals[i] * (radius + _heightCurve.Evaluate(heightMap[xz, xy]) * heightMultiplier);
     }
 
-    private static Mesh GenerateTris(int gridSize, Vector3[] vertices)
+    private static Mesh GenerateTris(int gridSize, Vector3[] vertices, int divs)
     {
-        int[] trianglesZ1 = new int[(gridSize * gridSize) * 12];
-        int[] trianglesX1 = new int[(gridSize * gridSize) * 12];
-        int[] trianglesY1 = new int[(gridSize * gridSize) * 12];
-		int[] trianglesZ2 = new int[(gridSize * gridSize) * 12];
-		int[] trianglesX2 = new int[(gridSize * gridSize) * 12];
-		int[] trianglesY2 = new int[(gridSize * gridSize) * 12];
-		int ring = (gridSize + gridSize) * 2;
-        int tZ = 0, tX = 0, tY = 0, v = 0;
-
-        for (int y = 0; y < gridSize; y++, v++)
-        {
-            for (int q = 0; q < gridSize; q++, v++)
-            {
-                tZ = MakeQuad(trianglesZ1, tZ, v, v + 1, v + ring, v + ring + 1);				
-			}
-			for (int q = 0; q < gridSize; q++, v++)
-            {
-                tX = MakeQuad(trianglesX1, tX, v, v + 1, v + ring, v + ring + 1);
-            }
-            for (int q = 0; q < gridSize; q++, v++)
-            {
-                tZ = MakeQuad(trianglesZ2, tZ, v, v + 1, v + ring, v + ring + 1);
-            }
-            for (int q = 0; q < gridSize - 1; q++, v++)
-            {
-                tX = MakeQuad(trianglesX2, tX, v, v + 1, v + ring, v + ring + 1);
-            }
-            tX = MakeQuad(trianglesX2, tX, v, v - ring + 1, v + ring, v + 1);
-        }
-		
-        tY = CreateBoxTop(gridSize, trianglesY1, tY, ring);        
-        tY = CreateBoxBot(gridSize, vertices, trianglesY2, tY, ring);
-        
-        Mesh mesh = new Mesh();
+        Mesh[] mesh = new Mesh[6];
         mesh.vertices = vertices;
-        mesh.subMeshCount = 6;
-        mesh.SetTriangles(trianglesZ1, 0);
-        mesh.SetTriangles(trianglesX1, 1);
-        mesh.SetTriangles(trianglesY1, 2);
-		mesh.SetTriangles(trianglesZ2, 3);
-		mesh.SetTriangles(trianglesX2, 4);
-		mesh.SetTriangles(trianglesY2, 5);
+        mesh.subMeshCount = divs*6;
+        int[][] triangles = new int[((gridSize*gridSize)*12)*divs*6][];
+        for (int i = 0; i < divs*6; i++)
+        {
+            triangles[i] = new int[(gridSize * gridSize) * 12];
+            triangles[i+1] = new int[(gridSize * gridSize) * 12];
+            triangles[i+2] = new int[(gridSize * gridSize) * 12];
+            triangles[i+3] = new int[(gridSize * gridSize) * 12];
+            triangles[i+4] = new int[(gridSize * gridSize) * 12];
+            triangles[i+5] = new int[(gridSize * gridSize) * 12];
+            int ring = (gridSize + gridSize) * 2;
+            int tZ = 0, tX = 0, tY = 0, v = 0;
+
+            for (int y = 0; y < gridSize; y++, v++)
+            {
+                for (int q = 0; q < gridSize; q++, v++)
+                {
+                    tZ = MakeQuad(triangles[i], tZ, v, v + 1, v + ring, v + ring + 1);
+                }
+                for (int q = 0; q < gridSize; q++, v++)
+                {
+                    tX = MakeQuad(triangles[i+1], tX, v, v + 1, v + ring, v + ring + 1);
+                }
+                for (int q = 0; q < gridSize; q++, v++)
+                {
+                    tZ = MakeQuad(triangles[i+2], tZ, v, v + 1, v + ring, v + ring + 1);
+                }
+                for (int q = 0; q < gridSize - 1; q++, v++)
+                {
+                    tX = MakeQuad(triangles[i+3], tX, v, v + 1, v + ring, v + ring + 1);
+                }
+                tX = MakeQuad(triangles[i+3], tX, v, v - ring + 1, v + ring, v + 1);
+            }
+
+            tY = CreateBoxTop(gridSize, triangles[i+4], tY, ring);
+            tY = CreateBoxBot(gridSize, vertices, triangles[i+5], tY, ring);
+            
+            mesh.SetTriangles(triangles[i], i);
+            mesh.SetTriangles(triangles[i+1], i+1);
+            mesh.SetTriangles(triangles[i + 2], i+2);
+            mesh.SetTriangles(triangles[i + 3], i+3);
+            mesh.SetTriangles(triangles[i + 4], i+4);
+            mesh.SetTriangles(triangles[i + 5], i+5);
+        }
 		return mesh;
     }
 

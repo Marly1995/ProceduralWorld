@@ -11,7 +11,7 @@ public class IslandGenerator : MonoBehaviour {
 
     public const int mapChunkSize = 241;
 
-	[Range(1,3)]
+	[Range(0,2)]
 	public int divisions;
 	[Range(10,50)]
 	public int gridSize;
@@ -38,17 +38,18 @@ public class IslandGenerator : MonoBehaviour {
 
     public void DrawMapInEditor()
     {
-		MapData[] mapData = new MapData[6*(int)Math.Pow(4, divisions)];
-		for (int i = 0; i < 6*(int)Math.Pow(4, divisions); i++)
-		{
-			mapData[i] = GenerateMapData(Vector2.zero, new Vector2(gridSize*i, 0));
-		}
+		MapData[] mapData = new MapData[6];
+        int i = ((int)Math.Pow(4, divisions));
+        for (int j = 0; j < 6; j++)
+        {            
+            mapData[j] = GenerateMapData(new Vector2(0, j*gridSize*i), gridSize * i+1);
+        }		
 
         MapDisplay display = FindObjectOfType<MapDisplay>();
         if (drawMode == DrawMode.NoiseMap) { display.DrawTexture(TextureGenerator.TextureFromHeightMap(mapData[0].heightMap)); }
         else if (drawMode == DrawMode.ColorMap) { display.DrawTexture(TextureGenerator.TextureFromColorMap(mapData[0].colorMap, mapChunkSize, mapChunkSize)); }
         //else if (drawMode == DrawMode.Mesh) { display.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData[0].heightMap, meshHeightmultiplier, meshHeightCurve, previewLOD), TextureGenerator.TextureFromColorMap(mapData.colorMap, mapChunkSize, mapChunkSize)); }
-        else if (drawMode == DrawMode.Sphere) { display.DrawSphere(sphereMapping.getSphere(gridSize, mapData, meshHeightmultiplier, meshHeightCurve)); }
+        else if (drawMode == DrawMode.Sphere) { display.DrawSphere(sphereMapping.getSphere(i, gridSize, mapData, meshHeightmultiplier, meshHeightCurve)); }
     }
 
     public void RequestMapData(Vector2 centre, Action<MapData> callback)
@@ -63,7 +64,7 @@ public class IslandGenerator : MonoBehaviour {
 
     void MapDataThread(Vector2 centre, Action<MapData> callback)
     {
-        MapData mapData = GenerateMapData(centre, centre);
+        MapData mapData = GenerateMapData(centre, 5);
         lock (mapDataThreadQueue)
         {
             mapDataThreadQueue.Enqueue(new MapThreadInfo<MapData>(callback, mapData));
@@ -109,22 +110,22 @@ public class IslandGenerator : MonoBehaviour {
         }
     }
 
-    MapData GenerateMapData(Vector2 centre, Vector2 inc)
+    MapData GenerateMapData(Vector2 centre, int Size)
     {
-        float[,] noiseMap = NoiseGeneration.GenerateNoiseMap(mapChunkSize, mapChunkSize, seed, noiseScale, sheets, persistance, lacunarity, centre + offset);
+        float[,] noiseMap = NoiseGeneration.GenerateNoiseMap(Size, Size, seed, noiseScale, sheets, persistance, lacunarity, centre + offset);
 
 
-        Color[] colorMap = new Color[mapChunkSize * mapChunkSize];
-        for (int y = 0; y < mapChunkSize; y++)
+        Color[] colorMap = new Color[Size * Size];
+        for (int y = 0; y < Size; y++)
         {
-            for (int x = 0; x < mapChunkSize; x++)
+            for (int x = 0; x < Size; x++)
             {
                 float currentHeight = noiseMap[x, y];
                 for (int i = 0; i < regions.Length; i++)
                 {
                     if(currentHeight <= regions[i].height)
                     {
-                        colorMap[y * mapChunkSize + x] = regions[i].color;
+                        colorMap[y * Size + x] = regions[i].color;
                         break;
                     }
                 }
@@ -171,8 +172,8 @@ public struct TerrainType
 
 public struct MapData
 {
-    public readonly float[,] heightMap;
-    public readonly Color[] colorMap;
+    public float[,] heightMap;
+    public Color[] colorMap;
     
     public MapData (float[,] heightMap, Color[] colorMap)
     {
