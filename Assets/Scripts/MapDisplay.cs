@@ -22,11 +22,10 @@ public class MapDisplay : MonoBehaviour {
         //meshRenderer.sharedMaterial.mainTexture = texture;
     }
 
-    public void DrawSphere(Mesh[] mesh)
+    public void DrawSphere(Mesh[] mesh, int divs)
     {
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < divs*6; i++)
         {
-            mesh[i].RecalculateNormals();
             meshFilter[i].sharedMesh = mesh[i];
             //meshRenderer.sharedMaterial.mainTexture = texture;
         }

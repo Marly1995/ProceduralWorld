@@ -42,14 +42,14 @@ public class IslandGenerator : MonoBehaviour {
         int i = ((int)Math.Pow(4, divisions));
         for (int j = 0; j < 6; j++)
         {            
-            mapData[j] = GenerateMapData(new Vector2(0, j*gridSize*i), gridSize * i+1);
+            mapData[j] = GenerateMapData(new Vector2(0, (j*gridSize*i)+1), (gridSize * i)+1);
         }		
 
         MapDisplay display = FindObjectOfType<MapDisplay>();
         if (drawMode == DrawMode.NoiseMap) { display.DrawTexture(TextureGenerator.TextureFromHeightMap(mapData[0].heightMap)); }
         else if (drawMode == DrawMode.ColorMap) { display.DrawTexture(TextureGenerator.TextureFromColorMap(mapData[0].colorMap, mapChunkSize, mapChunkSize)); }
         //else if (drawMode == DrawMode.Mesh) { display.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData[0].heightMap, meshHeightmultiplier, meshHeightCurve, previewLOD), TextureGenerator.TextureFromColorMap(mapData.colorMap, mapChunkSize, mapChunkSize)); }
-        else if (drawMode == DrawMode.Sphere) { display.DrawSphere(sphereMapping.getSphere(i, gridSize, mapData, meshHeightmultiplier, meshHeightCurve)); }
+        else if (drawMode == DrawMode.Sphere) { display.DrawSphere(sphereMapping.getSphere(i, gridSize, mapData, meshHeightmultiplier, meshHeightCurve), i); }
     }
 
     public void RequestMapData(Vector2 centre, Action<MapData> callback)
