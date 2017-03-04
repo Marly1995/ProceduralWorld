@@ -26,6 +26,7 @@ public class MapDisplay : MonoBehaviour {
     {
         for (int i = 0; i < divs*6; i++)
         {
+            mesh[i].RecalculateNormals();
             meshFilter[i].sharedMesh = mesh[i];
             //meshRenderer.sharedMaterial.mainTexture = texture;
         }

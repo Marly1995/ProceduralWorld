@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
@@ -23,6 +24,17 @@ public class sphereMapping : MonoBehaviour {
             meshes[i] = temp;
             meshes[i].RecalculateNormals();
         }
+        for (int i = 0; i < meshes.Length; i++)
+        {
+            if(i >= divs*1 && i < divs*3)
+            {
+                meshes[i].triangles = meshes[i].triangles.Reverse().ToArray();
+            }
+            if (i >= divs * 5 && i < divs * 6)
+            {
+                meshes[i].triangles = meshes[i].triangles.Reverse().ToArray();
+            }
+        }
 
         return meshes;
     }
@@ -35,8 +47,8 @@ public class sphereMapping : MonoBehaviour {
         for (int x = 0; x < divs; x++)
         {
             for (int y = 0; y < divs; y++)
-            {               
-                meshes[index] = XyPlane(gridSize, radius, heightMap[0].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, 0);
+            {
+                meshes[index] = XyPlane(gridSize, radius, heightMap[0].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));
                 index++;                    
             }               
         }
@@ -45,7 +57,7 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int y = 0; y < divs; y++)
             {
-                meshes[index] = YzPlane(gridSize, radius, heightMap[1].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, 0);
+                meshes[index] = ZyPlane(gridSize, radius, heightMap[1].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, 0);
                 index++;
             }
         }
@@ -54,7 +66,7 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int y = 0; y < divs; y++)
             {
-                meshes[index] = XyPlane(gridSize, radius, heightMap[2].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, gridSize*(int)Mathf.Pow(divs, 0.5f));
+                meshes[index] = XyPlane(gridSize, radius, heightMap[2].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, 0);
                 index++;
             }
         }
@@ -63,7 +75,7 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int y = 0; y < divs; y++)
             {
-                meshes[index] = YzPlane(gridSize, radius, heightMap[3].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));
+                meshes[index] = ZyPlane(gridSize, radius, heightMap[3].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));
                 index++;
             }
         }
@@ -124,15 +136,15 @@ public class sphereMapping : MonoBehaviour {
         return mesh;
     }
 
-    private static Mesh YzPlane(int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, int yStart, int zStart, int x)
+    private static Mesh ZyPlane(int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, int yStart, int zStart, int x)
     {
         Mesh mesh = new Mesh();
         Vector3[] vertices = new Vector3[(gridSize + 1) * (gridSize + 1)];
         Vector3[] normals = new Vector3[vertices.Length];
         int i = 0;
-        for (int y = 0; y <= gridSize; y++)
+        for (int z = 0; z <= gridSize; z++)
         {
-            for (int z = 0; z <= gridSize; z++)
+            for (int y = 0; y <= gridSize; y++)
             {
                 SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y + yStart, z + zStart, z + zStart, y + yStart);
             }
@@ -166,14 +178,14 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int x = 0; x < gridSize; x++)
             {
-                index = MakeQuad(triangles, index, y + gridSize, (y + gridSize) + x, y + x, y + x + 1);
-            }
+                index = MakeQuad(triangles, index, (y*(gridSize+1))+x, (y* (gridSize + 1)) +x+1, (y* (gridSize + 1)) + gridSize + x+1, (y * (gridSize + 1)) + gridSize + x+2);
+            }            
         }
         mesh.triangles = triangles;
 		return mesh;
     }
 
-    private static int MakeQuad(int[] triangles, int i, int v1, int v23, int v14, int v5)
+    private static int MakeQuad(int[] triangles, int i, int v1, int v14, int v23, int v5)
     {
         triangles[i] = v1;
         triangles[i + 1] = triangles[i + 4] = v14;
