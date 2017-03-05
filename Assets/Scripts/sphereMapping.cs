@@ -26,7 +26,7 @@ public class sphereMapping : MonoBehaviour {
         }
         for (int i = 0; i < meshes.Length; i++)
         {
-            if(i >= divs*1 && i < divs*3)
+            if (i >= divs * 1 && i < divs * 3)
             {
                 meshes[i].triangles = meshes[i].triangles.Reverse().ToArray();
             }
@@ -42,65 +42,78 @@ public class sphereMapping : MonoBehaviour {
     private static Mesh[] GenerateVerts(int divs, int gridSize, float radius, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve)
     {
         Mesh[] meshes = new Mesh[divs*6];
+        int inc = 0;
+        switch (divs)
+        {
+            case 1:
+                inc = 1;
+                break;
+            case 4:
+                inc = 2;
+                break;
+            case 16:
+                inc = 4;
+                break;
+        }
         int index = 0;
         // front
-        for (int x = 0; x < divs; x++)
+        for (int x = 0; x < inc; x++)
         {
-            for (int y = 0; y < divs; y++)
+            for (int y = 0; y < inc; y++)
             {
-                meshes[index] = XyPlane(gridSize, radius, heightMap[0].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));
+                meshes[index] = XyPlane(inc, gridSize, radius, heightMap[0].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));
                 index++;                    
             }               
         }
         // right
-        for (int x = 0; x < divs; x++)
+        for (int x = 0; x < inc; x++)
         {
-            for (int y = 0; y < divs; y++)
+            for (int y = 0; y < inc; y++)
             {
-                meshes[index] = ZyPlane(gridSize, radius, heightMap[1].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, 0);
+                meshes[index] = ZyPlane(inc, gridSize, radius, heightMap[1].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, 0);
                 index++;
             }
         }
         // back
-        for (int x = 0; x < divs; x++)
+        for (int x = 0; x < inc; x++)
         {
-            for (int y = 0; y < divs; y++)
+            for (int y = 0; y < inc; y++)
             {
-                meshes[index] = XyPlane(gridSize, radius, heightMap[2].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, 0);
+                meshes[index] = XyPlane(inc, gridSize, radius, heightMap[2].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, 0);
                 index++;
             }
         }
         // left
-        for (int x = 0; x < divs; x++)
+        for (int x = 0; x < inc; x++)
         {
-            for (int y = 0; y < divs; y++)
+            for (int y = 0; y < inc; y++)
             {
-                meshes[index] = ZyPlane(gridSize, radius, heightMap[3].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));
+                meshes[index] = ZyPlane(inc, gridSize, radius, heightMap[3].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));
                 index++;
             }
         }
         // bot
-        for (int x = 0; x < divs; x++)
+        for (int x = 0; x < inc; x++)
         {
-            for (int y = 0; y < divs; y++)
+            for (int y = 0; y < inc; y++)
             {
-                meshes[index] = XzPlane(gridSize, radius, heightMap[4].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, 0);
+                meshes[index] = XzPlane(inc, gridSize, radius, heightMap[4].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, 0);
                 index++;
             }
         }
         //top
-        for (int x = 0; x < divs; x++)
+        for (int x = 0; x < inc; x++)
         {
-            for (int y = 0; y < divs; y++)
+            for (int y = 0; y < inc; y++)
             {
-                meshes[index] = XzPlane(gridSize, radius, heightMap[5].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));
+                meshes[index] = XzPlane(inc, gridSize, radius, heightMap[5].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));
                 index++;
             }
         }
         return meshes;
     }
 
-    private static Mesh XyPlane(int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, int yStart, int xStart, int z)
+    private static Mesh XyPlane(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, int yStart, int xStart, int z)
     {
         Mesh mesh = new Mesh();
         Vector3[] vertices = new Vector3[(gridSize+1)*(gridSize+1)];
@@ -110,7 +123,7 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int x = 0; x <= gridSize; x++)
             {
-                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x + xStart, y + yStart, z, y + yStart, x + xStart);
+                SetVertex(inc, gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x + xStart, y + yStart, z, y + yStart, x + xStart);
             }
         }        
         mesh.vertices = vertices;
@@ -118,7 +131,7 @@ public class sphereMapping : MonoBehaviour {
         return mesh;
     }
 
-    private static Mesh XzPlane(int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, int zStart, int xStart, int y)
+    private static Mesh XzPlane(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, int zStart, int xStart, int y)
     {
         Mesh mesh = new Mesh();
         Vector3[] vertices = new Vector3[(gridSize + 1) * (gridSize + 1)];
@@ -128,7 +141,7 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int x = 0; x <= gridSize; x++)
             {
-                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x + xStart, y, z + zStart, z + zStart, x + xStart);
+                SetVertex(inc, gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x + xStart, y, z + zStart, z + zStart, x + xStart);
             }
         }
         mesh.vertices = vertices;
@@ -136,7 +149,7 @@ public class sphereMapping : MonoBehaviour {
         return mesh;
     }
 
-    private static Mesh ZyPlane(int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, int yStart, int zStart, int x)
+    private static Mesh ZyPlane(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, int yStart, int zStart, int x)
     {
         Mesh mesh = new Mesh();
         Vector3[] vertices = new Vector3[(gridSize + 1) * (gridSize + 1)];
@@ -146,7 +159,7 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int y = 0; y <= gridSize; y++)
             {
-                SetVertex(gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y + yStart, z + zStart, z + zStart, y + yStart);
+                SetVertex(inc, gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y + yStart, z + zStart, z + zStart, y + yStart);
             }
         }
         mesh.vertices = vertices;
@@ -154,9 +167,9 @@ public class sphereMapping : MonoBehaviour {
         return mesh;
     }
 
-    private static void SetVertex(int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, Vector3[] normals, Vector3[] vertices, int i, int x, int y, int z, int xy, int xz)
+    private static void SetVertex(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, Vector3[] normals, Vector3[] vertices, int i, int x, int y, int z, int xy, int xz)
     {       
-        Vector3 v = new Vector3(x, y, z) * 2.0f / gridSize - Vector3.one;
+        Vector3 v = new Vector3(x, y, z) * 2.0f / (gridSize*inc) - Vector3.one;
         float x2 = v.x * v.x;
         float y2 = v.y * v.y;
         float z2 = v.z * v.z;

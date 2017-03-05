@@ -13,7 +13,7 @@ public class IslandGenerator : MonoBehaviour {
 
 	[Range(0,2)]
 	public int divisions;
-	[Range(10,50)]
+	[Range(10,100)]
 	public int gridSize;
 	
     public float noiseScale;
