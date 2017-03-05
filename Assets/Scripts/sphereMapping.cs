@@ -6,62 +6,50 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class sphereMapping : MonoBehaviour {
 
-    public static Mesh[] getSphere(int divs, int gridSize, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve)
+    public static SegmentData[] getSphere(int divs, int gridSize, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve, TerrainType[] regions)
     {
     float radius = 5;
 
-    return Generate(divs, gridSize, radius, heightMap, heightMultiplier, _heightCurve);
+    return Generate(divs, gridSize, radius, heightMap, heightMultiplier, _heightCurve, regions);
     }
 
-    public static Mesh[] Generate(int divs, int gridSize, float radius, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve)
+    public static SegmentData[] Generate(int divs, int gridSize, float radius, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve, TerrainType[] regions)
     {
-        Mesh[] meshes = GenerateVerts(divs, gridSize, radius, heightMap, heightMultiplier, _heightCurve);
+        SegmentData[] segments = GenerateVerts(divs, gridSize, radius, heightMap, heightMultiplier, _heightCurve, regions);
 
-        for (int i = 0; i < meshes.Length; i++)
+        for (int i = 0; i < segments.Length; i++)
         {
             Mesh temp = new Mesh();
-            temp = GenerateTris(gridSize, meshes[i].vertices, divs);
-            meshes[i] = temp;
-            meshes[i].RecalculateNormals();
+            temp = GenerateTris(gridSize, segments[i].mesh.vertices, divs);
+            segments[i].mesh = temp;
+            segments[i].mesh.RecalculateNormals();
         }
-        for (int i = 0; i < meshes.Length; i++)
+        for (int i = 0; i < segments.Length; i++)
         {
             if (i >= divs * 1 && i < divs * 3)
             {
-                meshes[i].triangles = meshes[i].triangles.Reverse().ToArray();
+                segments[i].mesh.triangles = segments[i].mesh.triangles.Reverse().ToArray();
             }
             if (i >= divs * 5 && i < divs * 6)
             {
-                meshes[i].triangles = meshes[i].triangles.Reverse().ToArray();
+                segments[i].mesh.triangles = segments[i].mesh.triangles.Reverse().ToArray();
             }
         }
 
-        return meshes;
+        return segments;
     }
 
-    private static Mesh[] GenerateVerts(int divs, int gridSize, float radius, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve)
+    private static SegmentData[] GenerateVerts(int divs, int gridSize, float radius, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve, TerrainType[] regions)
     {
-        Mesh[] meshes = new Mesh[divs*6];
-        int inc = 0;
-        switch (divs)
-        {
-            case 1:
-                inc = 1;
-                break;
-            case 4:
-                inc = 2;
-                break;
-            case 16:
-                inc = 4;
-                break;
-        }
+        SegmentData[] segments = new SegmentData[divs*6];
+        int inc = (int)Mathf.Pow(divs, 0.5f);        
         int index = 0;
         // front
         for (int x = 0; x < inc; x++)
         {
             for (int y = 0; y < inc; y++)
             {
-                meshes[index] = XyPlane(inc, gridSize, radius, heightMap[0].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));
+                segments[index] = XyPlane(inc, gridSize, radius, heightMap[0].heightMap, heightMultiplier, _heightCurve, regions, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));                
                 index++;                    
             }               
         }
@@ -70,7 +58,7 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int y = 0; y < inc; y++)
             {
-                meshes[index] = ZyPlane(inc, gridSize, radius, heightMap[1].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, 0);
+                segments[index] = ZyPlane(inc, gridSize, radius, heightMap[1].heightMap, heightMultiplier, _heightCurve, regions, x * gridSize, y * gridSize, 0);
                 index++;
             }
         }
@@ -79,7 +67,7 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int y = 0; y < inc; y++)
             {
-                meshes[index] = XyPlane(inc, gridSize, radius, heightMap[2].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, 0);
+                segments[index] = XyPlane(inc, gridSize, radius, heightMap[2].heightMap, heightMultiplier, _heightCurve, regions, x * gridSize, y * gridSize, 0);
                 index++;
             }
         }
@@ -88,7 +76,7 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int y = 0; y < inc; y++)
             {
-                meshes[index] = ZyPlane(inc, gridSize, radius, heightMap[3].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));
+                segments[index] = ZyPlane(inc, gridSize, radius, heightMap[3].heightMap, heightMultiplier, _heightCurve, regions, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));
                 index++;
             }
         }
@@ -97,7 +85,7 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int y = 0; y < inc; y++)
             {
-                meshes[index] = XzPlane(inc, gridSize, radius, heightMap[4].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, 0);
+                segments[index] = XzPlane(inc, gridSize, radius, heightMap[4].heightMap, heightMultiplier, _heightCurve, regions, x * gridSize, y * gridSize, 0);
                 index++;
             }
         }
@@ -106,14 +94,14 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int y = 0; y < inc; y++)
             {
-                meshes[index] = XzPlane(inc, gridSize, radius, heightMap[5].heightMap, heightMultiplier, _heightCurve, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));
+                segments[index] = XzPlane(inc, gridSize, radius, heightMap[5].heightMap, heightMultiplier, _heightCurve, regions, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));
                 index++;
             }
         }
-        return meshes;
+        return segments;
     }
 
-    private static Mesh XyPlane(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, int yStart, int xStart, int z)
+    private static SegmentData XyPlane(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, TerrainType[] regions, int yStart, int xStart, int z)
     {
         Mesh mesh = new Mesh();
         Vector3[] vertices = new Vector3[(gridSize+1)*(gridSize+1)];
@@ -125,13 +113,30 @@ public class sphereMapping : MonoBehaviour {
             {
                 SetVertex(inc, gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x + xStart, y + yStart, z, y + yStart, x + xStart);
             }
-        }        
+        }
+        Color[] colorMap = new Color[gridSize * gridSize];
+        for (int y = 0; y < gridSize; y++)
+        {
+            for (int x = 0; x < gridSize; x++)
+            {
+                float currentHeight = heightMap[x+xStart, y+yStart];
+                for (int j = 0; j < regions.Length; j++)
+                {
+                    if (currentHeight <= regions[j].height)
+                    {
+                        colorMap[y*gridSize +x] = regions[j].color;                     
+                        break;                        
+                    }
+                }
+            }
+        }
         mesh.vertices = vertices;
         mesh.normals = normals;
-        return mesh;
+        SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize));
+        return segment;
     }
 
-    private static Mesh XzPlane(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, int zStart, int xStart, int y)
+    private static SegmentData XzPlane(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, TerrainType[] regions, int zStart, int xStart, int y)
     {
         Mesh mesh = new Mesh();
         Vector3[] vertices = new Vector3[(gridSize + 1) * (gridSize + 1)];
@@ -144,12 +149,31 @@ public class sphereMapping : MonoBehaviour {
                 SetVertex(inc, gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x + xStart, y, z + zStart, z + zStart, x + xStart);
             }
         }
+        Color[] colorMap = new Color[gridSize * gridSize];
+        int index = 0;
+        for (int z = zStart; z < zStart + gridSize; z++)
+        {
+            for (int x = xStart; x < xStart + gridSize; x++)
+            {
+                float currentHeight = heightMap[x, z];
+                for (int j = 0; j < regions.Length; j++)
+                {
+                    if (currentHeight <= regions[j].height)
+                    {
+                        colorMap[index] = regions[j].color;
+                        index++;
+                        break;
+                    }
+                }
+            }
+        }
         mesh.vertices = vertices;
         mesh.normals = normals;
-        return mesh;
+        SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize));
+        return segment;
     }
 
-    private static Mesh ZyPlane(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, int yStart, int zStart, int x)
+    private static SegmentData ZyPlane(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, TerrainType[] regions, int yStart, int zStart, int x)
     {
         Mesh mesh = new Mesh();
         Vector3[] vertices = new Vector3[(gridSize + 1) * (gridSize + 1)];
@@ -162,9 +186,28 @@ public class sphereMapping : MonoBehaviour {
                 SetVertex(inc, gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y + yStart, z + zStart, z + zStart, y + yStart);
             }
         }
+        Color[] colorMap = new Color[gridSize * gridSize];
+        int index = 0;
+        for (int z = zStart; z < zStart + gridSize; z++)
+        {
+            for (int y = yStart; y < yStart + gridSize; y++)
+            {
+                float currentHeight = heightMap[y, z];
+                for (int j = 0; j < regions.Length; j++)
+                {
+                    if (currentHeight <= regions[j].height)
+                    {
+                        colorMap[index] = regions[j].color;
+                        index++;
+                        break;
+                    }
+                }
+            }
+        }
         mesh.vertices = vertices;
         mesh.normals = normals;
-        return mesh;
+        SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize));
+        return segment;
     }
 
     private static void SetVertex(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, Vector3[] normals, Vector3[] vertices, int i, int x, int y, int z, int xy, int xz)

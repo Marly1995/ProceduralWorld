@@ -22,13 +22,14 @@ public class MapDisplay : MonoBehaviour {
         //meshRenderer.sharedMaterial.mainTexture = texture;
     }
 
-    public void DrawSphere(Mesh[] mesh, int divs)
+    public void DrawSphere(SegmentData[] segments, int divs)
     {
-        for (int i = 0; i < divs*6; i++)
+        for (int i = 0; i < segments.Length; i++)
         {
-            mesh[i].RecalculateNormals();
-            meshFilter[i].sharedMesh = mesh[i];
-            //meshRenderer.sharedMaterial.mainTexture = texture;
+            segments[i].mesh.RecalculateNormals();
+            meshFilter[i].sharedMesh = segments[i].mesh;
+            meshRenderer[i].sharedMaterial = new Material(Shader.Find("Specular"));
+            meshRenderer[i].sharedMaterial.mainTexture = segments[i].texture;
         }
     }
 

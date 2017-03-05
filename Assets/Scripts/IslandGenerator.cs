@@ -13,7 +13,7 @@ public class IslandGenerator : MonoBehaviour {
 
 	[Range(0,2)]
 	public int divisions;
-	[Range(10,100)]
+	[Range(10,250)]
 	public int gridSize;
 	
     public float noiseScale;
@@ -49,7 +49,7 @@ public class IslandGenerator : MonoBehaviour {
         if (drawMode == DrawMode.NoiseMap) { display.DrawTexture(TextureGenerator.TextureFromHeightMap(mapData[0].heightMap)); }
         else if (drawMode == DrawMode.ColorMap) { display.DrawTexture(TextureGenerator.TextureFromColorMap(mapData[0].colorMap, mapChunkSize, mapChunkSize)); }
         //else if (drawMode == DrawMode.Mesh) { display.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData[0].heightMap, meshHeightmultiplier, meshHeightCurve, previewLOD), TextureGenerator.TextureFromColorMap(mapData.colorMap, mapChunkSize, mapChunkSize)); }
-        else if (drawMode == DrawMode.Sphere) { display.DrawSphere(sphereMapping.getSphere(i, gridSize, mapData, meshHeightmultiplier, meshHeightCurve), i); }
+        else if (drawMode == DrawMode.Sphere) { display.DrawSphere(sphereMapping.getSphere(i, gridSize, mapData, meshHeightmultiplier, meshHeightCurve, regions), i); }
     }
 
     public void RequestMapData(Vector2 centre, Action<MapData> callback)
@@ -179,5 +179,17 @@ public struct MapData
     {
         this.heightMap = heightMap;
         this.colorMap = colorMap;
+    }
+}
+
+public struct SegmentData
+{
+    public Mesh mesh;
+    public Texture2D texture;
+
+    public SegmentData(Mesh mesh, Texture2D texture)
+    {
+        this.mesh = mesh;
+        this.texture = texture;
     }
 }
