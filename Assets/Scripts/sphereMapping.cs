@@ -61,7 +61,7 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int y = 0; y < inc; y++)
             {
-                segments[index] = ZyPlane(inc, gridSize, radius, heightMap[5].heightMap, heightMultiplier, _heightCurve, regions, x * gridSize, y * gridSize, 0);
+                segments[index] = ZyPlane(inc, gridSize, radius, heightMap[1].heightMap, heightMultiplier, _heightCurve, regions, x * gridSize, y * gridSize, 0);
                 index++;
             }
         }
@@ -70,7 +70,7 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int y = 0; y < inc; y++)
             {
-                segments[index] = XyPlane(inc, gridSize, radius, heightMap[2].heightMap, heightMultiplier, _heightCurve, regions, x * gridSize, y * gridSize, 0);
+                segments[index] = XyPlane(inc, gridSize, radius, heightMap[5].heightMap, heightMultiplier, _heightCurve, regions, x * gridSize, y * gridSize, 0);
                 index++;
             }
         }
@@ -79,7 +79,7 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int y = 0; y < inc; y++)
             {
-                segments[index] = ZyPlane(inc, gridSize, radius, heightMap[4].heightMap, heightMultiplier, _heightCurve, regions, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));
+                segments[index] = ZyPlane(inc, gridSize, radius, heightMap[3].heightMap, heightMultiplier, _heightCurve, regions, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));
                 index++;
             }
         }
@@ -88,7 +88,7 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int y = 0; y < inc; y++)
             {
-                segments[index] = XzPlane(inc, gridSize, radius, heightMap[3].heightMap, heightMultiplier, _heightCurve, regions, x * gridSize, y * gridSize, 0);
+                segments[index] = XzPlane(inc, gridSize, radius, heightMap[4].heightMap, heightMultiplier, _heightCurve, regions, x * gridSize, y * gridSize, 0);
                 index++;
             }
         }
@@ -97,7 +97,7 @@ public class sphereMapping : MonoBehaviour {
         {
             for (int y = 0; y < inc; y++)
             {
-                segments[index] = XzPlane(inc, gridSize, radius, heightMap[1].heightMap, heightMultiplier, _heightCurve, regions, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));
+                segments[index] = XzPlane(inc, gridSize, radius, heightMap[2].heightMap, heightMultiplier, _heightCurve, regions, x * gridSize, y * gridSize, gridSize * (int)Mathf.Pow(divs, 0.5f));
                 index++;
             }
         }

@@ -30,19 +30,22 @@ public class IslandGenerator : MonoBehaviour {
     public AnimationCurve meshHeightCurve;
 
     public bool autoUpdate;
+	public bool falloff;
 
     public TerrainType[] regions;
+	float[,] falloffMap;
 
     Queue<MapThreadInfo<MapData>> mapDataThreadQueue = new Queue<MapThreadInfo<MapData>>();
     Queue<MapThreadInfo<MeshData>> meshDataThreadQueue = new Queue<MapThreadInfo<MeshData>>();
 
     public void DrawMapInEditor()
-    {
+    {		
 		MapData[] mapData = new MapData[6];
-        int i = ((int)Math.Pow(4, divisions));
+        int i = ((int)Mathf.Pow(4, divisions));
         for (int j = 0; j < 6; j++)
-        {            
-            mapData[j] = GenerateMapData(new Vector2(0, (j*gridSize*i)+1), (gridSize * i)+1);
+        {
+			int k = (int)Mathf.Pow(i, 0.5f);
+            mapData[j] = GenerateMapData(new Vector2(0, (j*gridSize*k)+1), (gridSize * k)+1);
         }		
 
         MapDisplay display = FindObjectOfType<MapDisplay>();
@@ -120,6 +123,10 @@ public class IslandGenerator : MonoBehaviour {
         {
             for (int x = 0; x < Size; x++)
             {
+				if(falloff)
+				{
+					noiseMap[x, y] = Mathf.Clamp01(noiseMap[x,y] - falloffMap[x, y]);
+				}
                 float currentHeight = noiseMap[x, y];
                 for (int i = 0; i < regions.Length; i++)
                 {
@@ -144,8 +151,10 @@ public class IslandGenerator : MonoBehaviour {
         {
             sheets = 0;
         }
+		int i = ((int)Math.Pow(4, divisions));
+		falloffMap = FalloffGenerator.GenerateFalloff((gridSize * i) + 1);
 
-    }
+	}
 
     struct MapThreadInfo<T>
     {
