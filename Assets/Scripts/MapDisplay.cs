@@ -26,12 +26,11 @@ public class MapDisplay : MonoBehaviour {
     {
         for (int i = 0; i < segments.Length; i++)
         {
-            segments[i].mesh.RecalculateNormals();
             meshFilter[i].sharedMesh = segments[i].mesh;
-            meshRenderer[i].sharedMaterial = new Material(Shader.Find("Specular"));
+            meshRenderer[i].sharedMaterial = new Material(Shader.Find("Standard"));
             meshRenderer[i].sharedMaterial.mainTexture = segments[i].texture;
         }
-    }
+	}
 
     public void DrawTerrain(TerrainData terrainData)
     {
