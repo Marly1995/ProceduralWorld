@@ -29,8 +29,13 @@ public class IslandGenerator : MonoBehaviour {
     public float meshHeightmultiplier;
     public AnimationCurve meshHeightCurve;
 
-    public bool autoUpdate;
 	public bool falloff;
+	[Range(0, 10)]
+	public float falloff_a;
+	[Range(0, 10)]
+	public float falloff_b;
+
+	public bool autoUpdate;
 
     public TerrainType[] regions;
 	float[,] falloffMap;
@@ -152,7 +157,8 @@ public class IslandGenerator : MonoBehaviour {
             sheets = 0;
         }
 		int i = ((int)Math.Pow(4, divisions));
-		falloffMap = FalloffGenerator.GenerateFalloff((gridSize * i) + 1);
+		i = (int)Mathf.Pow(i, 0.5f);
+		falloffMap = FalloffGenerator.GenerateFalloff((gridSize * i) + 1, falloff_a, falloff_b);
 
 	}
 
