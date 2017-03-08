@@ -34,6 +34,11 @@ public class IslandGenerator : MonoBehaviour {
 	public float falloff_a;
 	[Range(0, 10)]
 	public float falloff_b;
+	[Range(0, 1)]
+	public float falloffHeight;
+	[Range(10, 100)]
+	public int halfIslandSize;
+	public int islandNumber;
 
 	public bool autoUpdate;
 
@@ -121,9 +126,11 @@ public class IslandGenerator : MonoBehaviour {
     MapData GenerateMapData(Vector2 centre, int Size)
     {
         float[,] noiseMap = NoiseGeneration.GenerateNoiseMap(Size, Size, seed, noiseScale, sheets, persistance, lacunarity, centre + offset);
+		float[,] fallMap = FalloffGenerator.GenerateFalloff((halfIslandSize*2)+1, falloff_a, falloff_b);
+		Vector2[] islands = new Vector2[islandNumber];
+		int[] islandHeights = new int[islandNumber];
 
-
-        Color[] colorMap = new Color[Size * Size];
+		Color[] colorMap = new Color[Size * Size];
         for (int y = 0; y < Size; y++)
         {
             for (int x = 0; x < Size; x++)
@@ -133,7 +140,17 @@ public class IslandGenerator : MonoBehaviour {
 					noiseMap[x, y] = Mathf.Clamp01(noiseMap[x,y] - falloffMap[x, y]);
 				}
                 float currentHeight = noiseMap[x, y];
-                for (int i = 0; i < regions.Length; i++)
+				if (currentHeight >= falloffHeight)
+				{
+					for (int i = 0; i < islandNumber; i++)
+					{
+						if (currentHeight > islandHeights[i])
+						{
+							islands[i] = new Vector2(x, y);
+						}
+					}
+				}
+				for (int i = 0; i < regions.Length; i++)
                 {
                     if(currentHeight <= regions[i].height)
                     {
@@ -143,8 +160,24 @@ public class IslandGenerator : MonoBehaviour {
                 }
             }
         }
+		for (int i = 0; i < islandNumber; i++)
+		{
+			for (int o = -halfIslandSize; o < halfIslandSize; o++)
+			{
+				for (int p = -halfIslandSize; p < halfIslandSize; p++)
+				{
+					int x = (int)islands[i].x;
+					int y = (int)islands[i].y;
+					if (y + p >= 0 && y + p < Size && x + o >= 0 && x + o < Size)
+					{
+						Debug.Log(p + halfIslandSize);
+						noiseMap[x + p, y + o] = Mathf.Clamp01(noiseMap[x + p, y + o] - fallMap[p + halfIslandSize, o + halfIslandSize]);
+					}
+				}
+			}
+		}
         return new global::MapData(noiseMap, colorMap);
-    }
+	}
 
     void OnValidate()
     {

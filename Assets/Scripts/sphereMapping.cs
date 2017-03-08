@@ -8,7 +8,7 @@ public class sphereMapping : MonoBehaviour {
 
     public static SegmentData[] getSphere(int divs, int gridSize, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve, TerrainType[] regions)
     {
-    float radius = 5;
+    float radius = 20;
 
     return Generate(divs, gridSize, radius, heightMap, heightMultiplier, _heightCurve, regions);
     }
