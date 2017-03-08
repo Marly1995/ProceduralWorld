@@ -1,0 +1,11 @@
+## Information
+
+A procedural generation unity project made for a university module.
+
+Parameters on the Island Generator game object can be used to generate worlds.
+
+Please be aware the project is currently in early developement and therefore does not feature any threading or optimization to make testing and implimenting new features less complex.
+Hopefully these features will be added in the final build.
+## Video
+
+https://www.youtube.com/watch?v=z3GPB-daAF0
