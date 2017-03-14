@@ -161,18 +161,26 @@ public class IslandGenerator : MonoBehaviour {
                 {
                     for (int i = 0; i < islandNumber; i++)
                     {
-                        if (currentHeight >= islandHeights[i])
+                        if (checkIslandOverlap(islands, x, y) &&
+                            currentHeight > islandHeights[i])
                         {
-                            if (checkIslandOverlap(islands, x, y))
-                            {
-                                islands[i] = new Vector2(x, y);
-                                islandHeights[i] = currentHeight;
-                                Debug.Log(x);
-                                Debug.Log(y);
-                                break;
-                            }
+                            islands[i] = new Vector2(x, y);
+                            islandHeights[i] = currentHeight;
+                            break;
                         }
                     }
+                    //for (int i = 0; i < islandNumber; i++)
+                    //{
+                    //    if (currentHeight >= islandHeights[i])
+                    //    {
+                    //        if (checkIslandOverlap(islands, x, y))
+                    //        {
+                    //            islands[i] = new Vector2(x, y);
+                    //            islandHeights[i] = currentHeight;
+                    //            break;
+                    //        }
+                    //    }
+                    //}
                 }
 				for (int i = 0; i < regions.Length; i++)
                 {
