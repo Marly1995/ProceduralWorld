@@ -123,9 +123,9 @@ public class IslandGenerator : MonoBehaviour {
         }
     }
 
-    bool checkIslandOverlap(Vector2[] islands, int x, int y)
+    bool checkIslandOverlap(List<Vector2> islands, int x, int y)
     {
-        for (int i = 0; i < islandNumber; i++)
+        for (int i = 0; i < islands.Count; i++)
         {
             if (x < (islands[i].x + halfIslandSize*2) &&
                 x > (islands[i].x - halfIslandSize*2))
@@ -143,9 +143,10 @@ public class IslandGenerator : MonoBehaviour {
     MapData GenerateMapData(Vector2 centre, int Size)
     {
         float[,] noiseMap = NoiseGeneration.GenerateNoiseMap(Size, Size, seed, noiseScale, sheets, persistance, lacunarity, centre + offset);
+        float[,] islandMap = new float[Size, Size];
 		float[,] fallMap = FalloffGenerator.GenerateFalloff((halfIslandSize*2)+1, falloff_a, falloff_b);
-		Vector2[] islands = new Vector2[islandNumber];
-		float[] islandHeights = new float[islandNumber];
+        List<Vector2> islands = new List<Vector2>();
+        List<float> heights = new List<float>();
 
 		Color[] colorMap = new Color[Size * Size];
         for (int y = 0; y < Size; y++)
@@ -159,29 +160,9 @@ public class IslandGenerator : MonoBehaviour {
                 float currentHeight = noiseMap[x, y];
                 if (currentHeight >= falloffHeight)
                 {
-                    for (int i = 0; i < islandNumber; i++)
-                    {
-                        if (checkIslandOverlap(islands, x, y) &&
-                            currentHeight > islandHeights[i])
-                        {
-                            islands[i] = new Vector2(x, y);
-                            islandHeights[i] = currentHeight;
-                            break;
-                        }
-                    }
-                    //for (int i = 0; i < islandNumber; i++)
-                    //{
-                    //    if (currentHeight >= islandHeights[i])
-                    //    {
-                    //        if (checkIslandOverlap(islands, x, y))
-                    //        {
-                    //            islands[i] = new Vector2(x, y);
-                    //            islandHeights[i] = currentHeight;
-                    //            break;
-                    //        }
-                    //    }
-                    //}
-                }
+                    islands.Add(new Vector2(x, y));
+                    heights.Add(currentHeight);                      
+                }                        
 				for (int i = 0; i < regions.Length; i++)
                 {
                     if(currentHeight <= regions[i].height)
@@ -192,23 +173,26 @@ public class IslandGenerator : MonoBehaviour {
                 }
             }
         }
-		for (int i = 0; i < islandNumber; i++)
+
+
+		for (int i = 0; i < islands.Count; i++)
 		{
 			int x = (int)islands[i].x;
 			int y = (int)islands[i].y;
-			
-			for (int o = -halfIslandSize; o < halfIslandSize; o++)
+            for (int o = -halfIslandSize; o < halfIslandSize; o++)
 			{
 				for (int p = -halfIslandSize; p < halfIslandSize; p++)
 				{
 					if (y + o > 0 && y + o < Size && x + p > 0 && x + p < Size)
 					{						
 						noiseMap[x + p, y + o] = Mathf.Clamp01(noiseMap[x + p, y + o] - fallMap[p + halfIslandSize, o + halfIslandSize]);
-					}
+                        islandMap[x + p, y + o] = noiseMap[x + p, y + o];
+
+                    }
 				}
 			}
 		}
-        return new global::MapData(noiseMap, colorMap);
+        return new global::MapData(islandMap, colorMap);
 	}
 
     void OnValidate()
