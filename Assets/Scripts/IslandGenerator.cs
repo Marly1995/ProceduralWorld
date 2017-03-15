@@ -158,14 +158,15 @@ public class IslandGenerator : MonoBehaviour {
 					noiseMap[x, y] = Mathf.Clamp01(noiseMap[x,y] - falloffMap[x, y]);
 				}
                 float currentHeight = noiseMap[x, y];
-                if (currentHeight >= falloffHeight)
+                if (currentHeight >= falloffHeight &&
+                    checkIslandOverlap(islands, x, y))
                 {
                     islands.Add(new Vector2(x, y));
                     heights.Add(currentHeight);                      
-                }                        
-				for (int i = 0; i < regions.Length; i++)
+                }
+                for (int i = 0; i < regions.Length; i++)
                 {
-                    if(currentHeight <= regions[i].height)
+                    if (currentHeight <= regions[i].height)
                     {
                         colorMap[y * Size + x] = regions[i].color;
                         break;
@@ -173,8 +174,6 @@ public class IslandGenerator : MonoBehaviour {
                 }
             }
         }
-
-
 		for (int i = 0; i < islands.Count; i++)
 		{
 			int x = (int)islands[i].x;
