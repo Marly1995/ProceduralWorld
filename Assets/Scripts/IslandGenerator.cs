@@ -206,7 +206,7 @@ public class IslandGenerator : MonoBehaviour {
         }
 		int i = ((int)Math.Pow(4, divisions));
 		i = (int)Mathf.Pow(i, 0.5f);
-		falloffMap = FalloffGenerator.GenerateFalloff((gridSize * i) + 1, falloff_a, falloff_b);
+		falloffMap = FalloffGenerator.GenerateFalloff((gridSize * i) + 1, 3.5f, 10.0f);
 
 	}
 
