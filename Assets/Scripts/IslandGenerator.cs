@@ -229,6 +229,7 @@ public struct TerrainType
 {
     public string name;
     public float height;
+    public float slope;
     public Color color;
 }
 

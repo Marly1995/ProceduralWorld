@@ -32,10 +32,12 @@ public class sphereMapping : MonoBehaviour {
             if (i >= divs * 1 && i < divs * 3)
             {
                 segments[i].mesh.triangles = segments[i].mesh.triangles.Reverse().ToArray();
+                segments[i].mesh.RecalculateNormals();
             }
             if (i >= divs * 5 && i < divs * 6)
             {
                 segments[i].mesh.triangles = segments[i].mesh.triangles.Reverse().ToArray();
+                segments[i].mesh.RecalculateNormals();
             }
         }
 
