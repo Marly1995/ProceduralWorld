@@ -21,23 +21,28 @@ public class sphereMapping : MonoBehaviour {
         {
             Mesh temp = new Mesh();
 			temp.vertices = segments[i].mesh.vertices;
-			temp.normals = segments[i].mesh.normals;			
+			Vector3[] sphereNormals = segments[i].mesh.normals;			
 			temp = GenerateTris(gridSize, segments[i].mesh.vertices, divs);
 			temp.uv = segments[i].mesh.uv;
 			segments[i].mesh = temp;
-            segments[i].mesh.RecalculateNormals();
-        }
-        for (int i = 0; i < segments.Length; i++)
-        {
+
             if (i >= divs * 1 && i < divs * 3)
             {
                 segments[i].mesh.triangles = segments[i].mesh.triangles.Reverse().ToArray();
-                segments[i].mesh.RecalculateNormals();
             }
             if (i >= divs * 5 && i < divs * 6)
             {
                 segments[i].mesh.triangles = segments[i].mesh.triangles.Reverse().ToArray();
-                segments[i].mesh.RecalculateNormals();
+            }
+            NormalData normalData = CalculateNormals(segments[i].mesh.triangles, segments[i].mesh.vertices);
+            segments[i].mesh.normals = normalData.vertexNormals;
+
+            for (int j = 0; j < normalData.triangleNormals.Length; j++)
+            {
+                if (Mathf.Acos(Vector3.Dot(normalData.triangleNormals[j], sphereNormals[j])) >= regions[6].slope)
+                {
+                    segments[i].colorMap[j] = regions[6].color;
+                }
             }
         }
 
@@ -140,7 +145,7 @@ public class sphereMapping : MonoBehaviour {
         mesh.vertices = vertices;
         mesh.normals = normals;
 		mesh.uv = uvs;		
-		SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize));
+		SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize), colorMap);
         return segment;
     }
 
@@ -180,7 +185,7 @@ public class sphereMapping : MonoBehaviour {
         mesh.vertices = vertices;
         mesh.normals = normals;
 		mesh.uv = uvs;
-		SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize));
+        SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize), colorMap);
         return segment;
     }
 
@@ -220,7 +225,7 @@ public class sphereMapping : MonoBehaviour {
         mesh.vertices = vertices;
         mesh.normals = normals;
 		mesh.uv = uvs;
-		SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize));
+        SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize), colorMap);
         return segment;
     }
 
@@ -264,20 +269,51 @@ public class sphereMapping : MonoBehaviour {
         return i + 6;
     }
 
-    //private void OnDrawGizmos()
-    //{
-    //    if (vertices == null)
-    //    {
-    //        return;
-    //    }
+    private static NormalData CalculateNormals(int[]triangles, Vector3[] vertices)
+    {
+        Vector3[] vertexNormals = new Vector3[vertices.Length];
+        Vector3[] triangleNormals = new Vector3[vertices.Length];
+        int triangleCount = triangles.Length / 3;
+        for (int i = 0; i < triangleCount; i++)
+        {
+            int normalTriangleIndex = i * 3;
+            int vertexIndexA = triangles[normalTriangleIndex];
+            int vertexIndexB = triangles[normalTriangleIndex + 1];
+            int vertexIndexC = triangles[normalTriangleIndex + 2];
 
-    //    Gizmos.color = Color.black;
-    //    for (int i = 0; i < vertices.Length; i++)
-    //    {
-    //        Gizmos.color = Color.black;
-    //        Gizmos.DrawSphere(vertices[i], 0.1f);
-    //        Gizmos.color = Color.yellow;
-    //        Gizmos.DrawRay(vertices[i], normals[i]);
-    //    }
-    //}
+            triangleNormals[i] = SurfaceNormalFromIndices(vertexIndexA, vertexIndexB, vertexIndexC, vertices);
+            vertexNormals[vertexIndexA] += triangleNormals[i];
+            vertexNormals[vertexIndexB] += triangleNormals[i];
+            vertexNormals[vertexIndexC] += triangleNormals[i];
+        }
+
+        for (int i = 0; i < vertexNormals.Length; i++)
+        {
+            vertexNormals[i].Normalize();
+        }
+        return new NormalData(vertexNormals, triangleNormals);
+    }
+
+    private static Vector3 SurfaceNormalFromIndices(int indexA, int indexB, int indexC, Vector3[] vertices)
+    {
+        Vector3 pointA = vertices[indexA];
+        Vector3 pointB = vertices[indexB];
+        Vector3 pointC = vertices[indexC];
+
+        Vector3 sideAB = pointB - pointA;
+        Vector3 sideAC = pointC - pointA;
+        return Vector3.Cross(sideAB, sideAC).normalized;
+    }
+}
+
+public struct NormalData
+{
+    public Vector3[] vertexNormals;
+    public Vector3[] triangleNormals;
+
+    public NormalData(Vector3[] vertexNormals, Vector3[] triangleNormals)
+    {
+        this.vertexNormals = vertexNormals;
+        this.triangleNormals = triangleNormals;
+    }
 }
