@@ -34,6 +34,7 @@ public class sphereMapping : MonoBehaviour {
             {
                 segments[i].mesh.triangles = segments[i].mesh.triangles.Reverse().ToArray();
             }
+            // normal branch
             NormalData normalData = CalculateNormals(segments[i].mesh.triangles, segments[i].mesh.vertices);
             segments[i].mesh.normals = normalData.vertexNormals;
             Mesh temp2 = new Mesh();
