@@ -36,14 +36,24 @@ public class sphereMapping : MonoBehaviour {
             }
             NormalData normalData = CalculateNormals(segments[i].mesh.triangles, segments[i].mesh.vertices);
             segments[i].mesh.normals = normalData.vertexNormals;
-
-            for (int j = 0; j < normalData.triangleNormals.Length; j++)
+            Mesh temp2 = new Mesh();
+            temp2.vertices = sphereNormals;
+            temp2 = GenerateTris(gridSize, temp.vertices, divs);
+            NormalData sphereData = CalculateNormals(temp2.triangles, temp2.vertices);
+            for (int j = 0; j < normalData.triangleNormals.Length/2; j++)
             {
-                if (Mathf.Acos(Vector3.Dot(normalData.triangleNormals[j], sphereNormals[j])) >= regions[6].slope)
+                float b1 = Mathf.Acos(Vector3.Dot(normalData.triangleNormals[j * 2], sphereData.triangleNormals[j * 2]));
+                float b2 = Mathf.Acos(Vector3.Dot(normalData.triangleNormals[(j * 2) + 1], sphereData.triangleNormals[(j * 2) + 1]));
+                for (int k = 0; k < regions.Length; k++)
                 {
-                    segments[i].colorMap[j] = regions[6].color;
-                }
+                    if (b1 <= regions[k].slope ||
+                    b2 <= regions[k].slope)
+                    {
+                        segments[i].colorMap[j] = regions[k].color;
+                    }
+                }           
             }
+            segments[i].texture = TextureGenerator.TextureFromColorMap(segments[i].colorMap, gridSize, gridSize);
         }
 
         return segments;
@@ -241,6 +251,7 @@ public class sphereMapping : MonoBehaviour {
         s.z = v.z * Mathf.Sqrt(1f - x2 / 2f - y2 / 2f + x2 * y2 / 3f);
 		normals[i] = s.normalized;       
         vertices[i] = normals[i] * (radius + _heightCurve.Evaluate(heightMap[xz, xy]) * heightMultiplier);
+        normals[i] *= radius;
     }
 
     private static Mesh GenerateTris(int gridSize, Vector3[] vertices, int divs)
@@ -272,8 +283,8 @@ public class sphereMapping : MonoBehaviour {
     private static NormalData CalculateNormals(int[]triangles, Vector3[] vertices)
     {
         Vector3[] vertexNormals = new Vector3[vertices.Length];
-        Vector3[] triangleNormals = new Vector3[vertices.Length];
         int triangleCount = triangles.Length / 3;
+        Vector3[] triangleNormals = new Vector3[triangleCount];        
         for (int i = 0; i < triangleCount; i++)
         {
             int normalTriangleIndex = i * 3;
