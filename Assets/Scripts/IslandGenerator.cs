@@ -36,7 +36,7 @@ public class IslandGenerator : MonoBehaviour {
 	public float falloff_b;
 	[Range(0, 1)]
 	public float falloffHeight;
-	[Range(10, 100)]
+	[Range(10, 500)]
 	public int halfIslandSize;
 	public int islandNumber = 5;
 
@@ -228,8 +228,8 @@ public class IslandGenerator : MonoBehaviour {
 public struct TerrainType
 {
     public string name;
+    [Range(0, 1)]
     public float height;
-    public float slope;
     public Color color;
 }
 
@@ -250,12 +250,10 @@ public struct SegmentData
 {
     public Mesh mesh;
     public Texture2D texture;
-    public Color[] colorMap;
 
-    public SegmentData(Mesh mesh, Texture2D texture, Color[] colorMap)
+    public SegmentData(Mesh mesh, Texture2D texture)
     {
         this.mesh = mesh;
         this.texture = texture;
-        this.colorMap = colorMap;
     }
 }
