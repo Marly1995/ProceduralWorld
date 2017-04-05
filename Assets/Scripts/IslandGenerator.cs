@@ -231,6 +231,7 @@ public struct TerrainType
     [Range(0, 1)]
     public float height;
     public Color color;
+    public float slope;
 }
 
 
@@ -250,10 +251,12 @@ public struct SegmentData
 {
     public Mesh mesh;
     public Texture2D texture;
+    public Color[] colorMap;
 
-    public SegmentData(Mesh mesh, Texture2D texture)
+    public SegmentData(Mesh mesh, Texture2D texture, Color[] colorMap)
     {
         this.mesh = mesh;
         this.texture = texture;
+        this.colorMap = colorMap;
     }
 }
