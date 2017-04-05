@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -265,7 +265,8 @@ public class sphereMapping : MonoBehaviour {
     {
         Vector3[] vertexNormals = new Vector3[vertices.Length];
         int triangleCount = triangles.Length / 3;
-        Vector3[] triangleNormals = new Vector3[triangleCount];        
+        Vector3[] triangleNormals = new Vector3[triangleCount];
+        Vector3[] sphereNormals = new Vector3[triangleCount];
         for (int i = 0; i < triangleCount; i++)
         {
             int normalTriangleIndex = i * 3;
@@ -274,6 +275,7 @@ public class sphereMapping : MonoBehaviour {
             int vertexIndexC = triangles[normalTriangleIndex + 2];
 
             triangleNormals[i] = SurfaceNormalFromIndices(vertexIndexA, vertexIndexB, vertexIndexC, vertices);
+            sphereNormals[i] = SphereNormalFromIndices(vertexIndexA, vertexIndexB, vertexIndexC, vertices);
             vertexNormals[vertexIndexA] += triangleNormals[i];
             vertexNormals[vertexIndexB] += triangleNormals[i];
             vertexNormals[vertexIndexC] += triangleNormals[i];
@@ -283,7 +285,7 @@ public class sphereMapping : MonoBehaviour {
         {
             vertexNormals[i].Normalize();
         }
-        return new NormalData(vertexNormals, triangleNormals);
+        return new NormalData(vertexNormals, triangleNormals, sphereNormals);
     }
 
     private static Vector3 SurfaceNormalFromIndices(int indexA, int indexB, int indexC, Vector3[] vertices)
@@ -296,16 +298,32 @@ public class sphereMapping : MonoBehaviour {
         Vector3 sideAC = pointC - pointA;
         return Vector3.Cross(sideAB, sideAC).normalized;
     }
+
+    private static Vector3 SphereNormalFromIndices(int indexA, int indexB, int indexC, Vector3[] vertices)
+    {
+        Vector3 pointA = vertices[indexA];
+        Vector3 pointB = vertices[indexB];
+        Vector3 pointC = vertices[indexC];
+
+        float x = (pointA.x + pointB.x + pointC.x) / 3;
+        float y = (pointA.y + pointB.y + pointC.y) / 3;
+        float z = (pointA.z + pointB.z + pointC.z) / 3;
+
+        Vector3 v = new Vector3(x, y, z);
+        return v.normalized;
+    }
 }
 
 public struct NormalData
 {
     public Vector3[] vertexNormals;
     public Vector3[] triangleNormals;
+    public Vector3[] sphereNormals;
 
-    public NormalData(Vector3[] vertexNormals, Vector3[] triangleNormals)
+    public NormalData(Vector3[] vertexNormals, Vector3[] triangleNormals, Vector3[] sphereNormals)
     {
         this.vertexNormals = vertexNormals;
         this.triangleNormals = triangleNormals;
+        this.sphereNormals = sphereNormals;
     }
 }
