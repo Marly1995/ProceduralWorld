@@ -92,13 +92,15 @@ public static class NoiseGeneration
     {
         RiggedMultifractal rmf = new RiggedMultifractal();
 
+        Voronoi vor = new Voronoi();
+
         Perlin perlin = new Perlin(scale, lacunarity, persistance, sheets, seed, QualityMode.High);
 
         Const constGen = new Const(0.5f);
 
         var finalGenerator = new Add(new Multiply(perlin, constGen), new Multiply(rmf, constGen));
 
-        Noise2D noiseGenerator = new Noise2D(mapWidth, mapHeight, finalGenerator);
+        Noise2D noiseGenerator = new Noise2D(mapWidth, mapHeight, vor);
 
         noiseGenerator.GeneratePlanar(0f, 1f, 0f, 1f);
 
