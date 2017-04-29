@@ -41,6 +41,7 @@ public class IslandGenerator : MonoBehaviour {
 	public int islandNumber = 5;
 
 	public bool autoUpdate;
+    public bool flat_shading;
 
     public TerrainType[] regions;
 	float[,] falloffMap;
@@ -62,7 +63,7 @@ public class IslandGenerator : MonoBehaviour {
         if (drawMode == DrawMode.NoiseMap) { display.DrawTexture(TextureGenerator.TextureFromHeightMap(mapData[0].heightMap)); }
         else if (drawMode == DrawMode.ColorMap) { display.DrawTexture(TextureGenerator.TextureFromColorMap(mapData[0].colorMap, mapChunkSize, mapChunkSize)); }
         //else if (drawMode == DrawMode.Mesh) { display.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData[0].heightMap, meshHeightmultiplier, meshHeightCurve, previewLOD), TextureGenerator.TextureFromColorMap(mapData.colorMap, mapChunkSize, mapChunkSize)); }
-        else if (drawMode == DrawMode.Sphere) { display.DrawSphere(sphereMapping.getSphere(i, gridSize, mapData, meshHeightmultiplier, meshHeightCurve, regions), i); }
+        else if (drawMode == DrawMode.Sphere) { display.DrawSphere(sphereMapping.getSphere(i, gridSize, mapData, meshHeightmultiplier, meshHeightCurve, regions, flat_shading), i); }
     }
 
     public void RequestMapData(Vector2 centre, Action<MapData> callback)
@@ -142,7 +143,7 @@ public class IslandGenerator : MonoBehaviour {
 
     MapData GenerateMapData(Vector2 centre, int Size)
     {
-        float[,] noiseMap = NoiseGeneration.GenerateLibNoiseMap(Size, Size, seed, noiseScale, sheets, persistance, lacunarity, centre + offset);
+        float[,] noiseMap = NoiseGeneration.GenerateNoiseMap(Size, Size, seed, noiseScale, sheets, persistance, lacunarity, centre + offset);
         float[,] islandMap = new float[Size, Size];
 		float[,] fallMap = FalloffGenerator.GenerateFalloff((halfIslandSize*2)+1, falloff_a, falloff_b);
         List<Vector2> islands = new List<Vector2>();

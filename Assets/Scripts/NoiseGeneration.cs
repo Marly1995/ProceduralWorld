@@ -100,7 +100,7 @@ public static class NoiseGeneration
 
         var finalGenerator = new Add(new Multiply(perlin, constGen), new Multiply(rmf, constGen));
 
-        Noise2D noiseGenerator = new Noise2D(mapWidth, mapHeight, vor);
+        Noise2D noiseGenerator = new Noise2D(mapWidth, mapHeight, finalGenerator);
 
         noiseGenerator.GeneratePlanar(0f, 1f, 0f, 1f);
 
