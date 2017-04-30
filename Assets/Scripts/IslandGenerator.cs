@@ -103,26 +103,26 @@ public class IslandGenerator : MonoBehaviour {
         }
     }
 
-    void Update()
-    {
-        if(mapDataThreadQueue.Count > 0)
-        {
-            for (int i = 0; i < mapDataThreadQueue.Count; i++)
-            {
-                MapThreadInfo<MapData> threadInfo = mapDataThreadQueue.Dequeue();
-                threadInfo.callback(threadInfo.parameter);
-            }
-        }
-
-        if (meshDataThreadQueue.Count > 0)
-        {
-            for (int i = 0; i < meshDataThreadQueue.Count; i++)
-            {
-                MapThreadInfo<MeshData> threadInfo = meshDataThreadQueue.Dequeue();
-                threadInfo.callback(threadInfo.parameter);
-            }
-        }
-    }
+//    void Update()
+//    {
+//        if(mapDataThreadQueue.Count > 0)
+//        {
+//            for (int i = 0; i < mapDataThreadQueue.Count; i++)
+//            {
+//                MapThreadInfo<MapData> threadInfo = mapDataThreadQueue.Dequeue();
+//                threadInfo.callback(threadInfo.parameter);
+//            }
+//        }
+//
+//        if (meshDataThreadQueue.Count > 0)
+//        {
+//            for (int i = 0; i < meshDataThreadQueue.Count; i++)
+//            {
+//                MapThreadInfo<MeshData> threadInfo = meshDataThreadQueue.Dequeue();
+//                threadInfo.callback(threadInfo.parameter);
+//            }
+//        }
+//    }
 
     bool checkIslandOverlap(List<Vector2> islands, int x, int y)
     {
@@ -252,12 +252,13 @@ public struct SegmentData
 {
     public Mesh mesh;
     public Texture2D texture;
-    public Color[] colorMap;
+	public MapData MapData;
 
-    public SegmentData(Mesh mesh, Texture2D texture, Color[] colorMap)
+
+	public SegmentData(Mesh mesh, Texture2D texture, Color[] colorMap, float[,] heightMap)
     {
         this.mesh = mesh;
         this.texture = texture;
-        this.colorMap = colorMap;
+		this.MapData = new MapData(heightMap, colorMap);
     }
 }

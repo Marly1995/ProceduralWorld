@@ -30,6 +30,8 @@ public class MapDisplay : MonoBehaviour {
             meshRenderer[i].sharedMaterial = new Material(Shader.Find("Standard"));
             meshRenderer[i].sharedMaterial.mainTexture = segments[i].texture;
         }
+		PopulatWorld world = FindObjectOfType<PopulatWorld> ();
+		world.Populate (segments);
 	}
 
     public void DrawTerrain(TerrainData terrainData)

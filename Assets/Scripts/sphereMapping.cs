@@ -40,7 +40,7 @@ public class sphereMapping : MonoBehaviour {
             }
             //NormalData normalData = CalculateNormals(segments[i].mesh.triangles, segments[i].mesh.vertices);
             //segments[i].mesh.normals = normalData.vertexNormals;
-
+			segments[i].mesh.RecalculateNormals();
             //for (int j = 0; j < normalData.triangleNormals.Length / 2; j++)
             //{
             //    float b1 = Vector3.Angle(normalData.triangleNormals[j * 2], normalData.sphereNormals[j * 2]);
@@ -51,7 +51,7 @@ public class sphereMapping : MonoBehaviour {
             //        segments[i].colorMap[j] = regions[5].color;
             //    }
             //}
-            segments[i].texture = TextureGenerator.TextureFromColorMap(segments[i].colorMap, gridSize, gridSize);
+            segments[i].texture = TextureGenerator.TextureFromColorMap(segments[i].MapData.colorMap, gridSize, gridSize);
         }
 
         return segments;
@@ -153,7 +153,7 @@ public class sphereMapping : MonoBehaviour {
         mesh.vertices = vertices;
         mesh.normals = normals;
 		mesh.uv = uvs;		
-		SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize), colorMap);
+		SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize), colorMap, heightMap);
         return segment;
     }
 
@@ -193,7 +193,7 @@ public class sphereMapping : MonoBehaviour {
         mesh.vertices = vertices;
         mesh.normals = normals;
 		mesh.uv = uvs;
-        SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize), colorMap);
+		SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize), colorMap, heightMap);
         return segment;
     }
 
@@ -233,7 +233,7 @@ public class sphereMapping : MonoBehaviour {
         mesh.vertices = vertices;
         mesh.normals = normals;
 		mesh.uv = uvs;
-        SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize), colorMap);
+		SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize), colorMap, heightMap);
         return segment;
     }
 
