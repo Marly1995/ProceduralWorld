@@ -29,17 +29,15 @@ public class PopulatWorld : MonoBehaviour {
 			{
 				for (int y = 0; y < gridSize; y++) 
 				{
-					if (worldData [i].MapData.heightMap [x, y] >= 0.55f &&
-					   worldData [i].MapData.heightMap [x, y] <= 0.6f) 
-					{
-						countdown--;
-						if (countdown <= 0)
-						{
-							Vector3 position = worldData [i].mesh.vertices [worldData [i].mesh.triangles [index * 6]];
-							Debug.Log (position.magnitude);
+					Vector3 position = worldData [i].mesh.vertices [worldData [i].mesh.triangles [index * 6]];
+					//Debug.Log (position.magnitude);
+					if (position.magnitude >= 101.0f &&
+					    position.magnitude <= 101.4f) {
+						if (countdown <= 0) {
 							Instantiate (tree, position, Quaternion.identity);
 							countdown = (int)Random.Range (2.0f, 6.0f);
 						}
+						countdown--;
 					}
 					index++;
 				}
