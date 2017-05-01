@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PopulatWorld : MonoBehaviour {
 
-	public SegmentData[] worldData;
+    public SegmentData[] worldData;
     ObjectLocations[] objectLocations;
     public int gridSize;
 
@@ -26,6 +26,8 @@ public class PopulatWorld : MonoBehaviour {
 
     public GameObject villageLocation;
     public List<SpawnLocation> villageLocations;
+
+    public GameObject beachHut1;
 	// Use this for initialization
 	public void Populate (SegmentData[] segments) {
 		worldData = segments;
@@ -47,6 +49,8 @@ public class PopulatWorld : MonoBehaviour {
         forestTreeHolder = forestTreeHolderOriginal;
 
         LocateVillageLocations();
+
+        PopulateVillages();
     }
 
     void LocateVillageLocations()
@@ -99,6 +103,13 @@ public class PopulatWorld : MonoBehaviour {
        }
     }
 
+    void PopulateVillages()
+    {
+        for (int i = 0; i < villageLocations.Count; i++)
+        {
+            Instantiate(beachHut1, villageLocations[i].obj.transform.position, Quaternion.identity);
+        }
+    }
 	void PopulateTrees()
 	{
 		for (int i = 0; i < worldData.Length; i++) 
