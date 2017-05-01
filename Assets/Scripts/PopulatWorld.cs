@@ -25,10 +25,12 @@ public class PopulatWorld : MonoBehaviour {
     public GameObject palmTree2;
 
     public GameObject villageLocation;
+    public List<SpawnLocation> villageLocations;
 	// Use this for initialization
 	public void Populate (SegmentData[] segments) {
 		worldData = segments;
         objectLocations = new ObjectLocations[segments.Length];
+        villageLocations = new List<SpawnLocation>();
 
         pineTreeHolderOriginal = pineTreeHolder;
         palmTreeHolderOriginal = palmTreeHolder;
@@ -74,9 +76,22 @@ public class PopulatWorld : MonoBehaviour {
                             }
                         }
 
-                        if (terraincheck >= (gridSize/8) * (gridSize/8))
+                        if (terraincheck >= (gridSize / 8) * (gridSize / 8))
                         {
-                            Instantiate(villageLocation, objectLocations[i].position[x, y], Quaternion.identity);
+                            bool spawn = true;
+                            for (int k = 0; k < villageLocations.Count; k++)
+                            {
+                                if (Vector3.Distance(objectLocations[i].position[x, y], villageLocations[k].obj.transform.position) <= 100.0f)
+                                {
+                                    spawn = false;
+                                    break;
+                                }
+                            }
+                            if (spawn == true)
+                            {
+                                GameObject village = Instantiate(villageLocation, objectLocations[i].position[x, y], Quaternion.identity);
+                                villageLocations.Add(new SpawnLocation(x, y, i, village));
+                            }
                         }
                     }
                 }
@@ -214,6 +229,22 @@ public class PopulatWorld : MonoBehaviour {
             space = new bool[size,size];
             position = new Vector3[size, size];
             height = new float[size, size];
+        }
+    }
+
+    public struct SpawnLocation
+    {
+        public GameObject obj;
+        public int chunk;
+        public int x;
+        public int y;
+
+        public SpawnLocation(int x, int y, int chunk, GameObject obj)
+        {
+            this.obj = obj;
+            this.x = x;
+            this.y = y;
+            this.chunk = chunk;
         }
     }
 }
