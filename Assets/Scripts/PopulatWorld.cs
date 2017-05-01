@@ -51,14 +51,33 @@ public class PopulatWorld : MonoBehaviour {
     {
         for (int i = 0; i < worldData.Length; i++)
         {
-            for (int x = 0; x < gridSize; x+=gridSize/10)
+            for (int x = 0; x < gridSize; x+=gridSize/4)
             {
-                for (int y = 0; y < gridSize; y+=gridSize/10)
+                for (int y = 0; y < gridSize; y+=gridSize/4)
                 {
                     if (objectLocations[i].height[x,y] >= 100.82f &&
                         objectLocations[i].height[x,y] <= 100.99f)
                     {
-                        Instantiate(villageLocation, objectLocations[i].position[x,y], Quaternion.identity);
+                        int terraincheck = 0;
+                        for (int o = x-gridSize/4; o < x+gridSize/4; o++)
+                        {
+                            for (int p = y-gridSize/4; p < y+gridSize/4; p++)
+                            {
+                                if (o < gridSize && o >= 0 && p < gridSize && p >= 0)
+                                {
+                                    if (objectLocations[i].height[o, p] >= 100.82f &&
+                                        objectLocations[i].height[o, p] <= 100.99f)
+                                    {
+                                        terraincheck++;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (terraincheck <= (gridSize/8) * (gridSize/8))
+                        {
+                            Instantiate(villageLocation, objectLocations[i].position[x, y], Quaternion.identity);
+                        }
                     }
                 }
             }
