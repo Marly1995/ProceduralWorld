@@ -5,7 +5,8 @@ using UnityEngine;
 public class PopulatWorld : MonoBehaviour {
 
 	public SegmentData[] worldData;
-	public int gridSize;
+    ObjectLocations[] objectLocations;
+    public int gridSize;
 
     public GameObject pineTreeHolder;
     GameObject pineTreeHolderOriginal;
@@ -23,25 +24,46 @@ public class PopulatWorld : MonoBehaviour {
     public GameObject palmTree1;
     public GameObject palmTree2;
 
+    public GameObject villageLocation;
 	// Use this for initialization
 	public void Populate (SegmentData[] segments) {
 		worldData = segments;
+        objectLocations = new ObjectLocations[segments.Length];
+
         pineTreeHolderOriginal = pineTreeHolder;
         palmTreeHolderOriginal = palmTreeHolder;
         forestTreeHolderOriginal = forestTreeHolder;
+
         pineTreeHolder = Instantiate(pineTreeHolder);
         forestTreeHolder = Instantiate(forestTreeHolder);
         palmTreeHolder = Instantiate(palmTreeHolder);
-		PopulateTrees ();
+
+		PopulateTrees();
+
         pineTreeHolder = pineTreeHolderOriginal;
         palmTreeHolder = palmTreeHolderOriginal;
         forestTreeHolder = forestTreeHolderOriginal;
+
+        LocateVillageLocations();
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
+    void LocateVillageLocations()
+    {
+        for (int i = 0; i < worldData.Length; i++)
+        {
+            for (int x = 0; x < gridSize; x+=gridSize/10)
+            {
+                for (int y = 0; y < gridSize; y+=gridSize/10)
+                {
+                    if (objectLocations[i].height[x,y] >= 100.82f &&
+                        objectLocations[i].height[x,y] <= 100.99f)
+                    {
+                        Instantiate(villageLocation, objectLocations[i].position[x,y], Quaternion.identity);
+                    }
+                }
+            }
+       }
+    }
 
 	void PopulateTrees()
 	{
@@ -51,6 +73,7 @@ public class PopulatWorld : MonoBehaviour {
 			int pineTreeCountdown = 0;
             int forestTreeCountdown = 0;
             int palmTreeCountdown = 0;
+            objectLocations[i] = new ObjectLocations(gridSize);
 
             for (int x = 0; x < gridSize; x++) 
 			{
@@ -58,6 +81,9 @@ public class PopulatWorld : MonoBehaviour {
 				{
 					Vector3 position = worldData [i].mesh.vertices [worldData [i].mesh.triangles [index * 6]];
                     float height = position.magnitude;
+
+                    objectLocations[i].position[x, y] = position;
+                    objectLocations[i].height[x, y] = height;
 
                     // PINE TREES
                     if (height >= 101.0f &&
@@ -67,6 +93,7 @@ public class PopulatWorld : MonoBehaviour {
                         {
                             SpawnPineTree(position);
                             pineTreeCountdown = (int)Random.Range(2.0f, 6.0f);
+                            objectLocations[i].space[x, y] = true;
                         }
                         pineTreeCountdown--;
                     }
@@ -79,6 +106,7 @@ public class PopulatWorld : MonoBehaviour {
                         {
                             SpawnForestTree(position);
                             forestTreeCountdown = (int)Random.Range(20.0f, 60.0f);
+                            objectLocations[i].space[x, y] = true;
                         }
                         forestTreeCountdown--;
                     }
@@ -90,6 +118,7 @@ public class PopulatWorld : MonoBehaviour {
                         {
                             SpawnPalmTree(position);
                             palmTreeCountdown = (int)Random.Range(10.0f, 30.0f);
+                            objectLocations[i].space[x, y] = true;
                         }
                         palmTreeCountdown--;
                     }
@@ -155,4 +184,17 @@ public class PopulatWorld : MonoBehaviour {
         }
     }
 
+    public struct ObjectLocations
+    {
+        public bool[,] space;
+        public Vector3[,] position;
+        public float[,] height;
+
+        public ObjectLocations(int size)
+        {
+            space = new bool[size,size];
+            position = new Vector3[size, size];
+            height = new float[size, size];
+        }
+    }
 }
