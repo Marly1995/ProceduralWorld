@@ -74,7 +74,7 @@ public class PopulatWorld : MonoBehaviour {
                             }
                         }
 
-                        if (terraincheck <= (gridSize/8) * (gridSize/8))
+                        if (terraincheck >= (gridSize/8) * (gridSize/8))
                         {
                             Instantiate(villageLocation, objectLocations[i].position[x, y], Quaternion.identity);
                         }
