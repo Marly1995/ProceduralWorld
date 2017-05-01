@@ -24,7 +24,11 @@ public class sphereMapping : MonoBehaviour {
 			Vector3[] sphereNormals = segments[i].mesh.normals;			
 			temp = GenerateTris(gridSize, segments[i].mesh.vertices, divs);
 			temp.uv = segments[i].mesh.uv;
-			segments[i].mesh = temp;
+            if (useFlatShading)
+            {
+                temp = flatShading(temp);
+            }
+            segments[i].mesh = temp;
 
             if (i >= divs * 1 && i < divs * 3)
             {
@@ -34,10 +38,7 @@ public class sphereMapping : MonoBehaviour {
             {
                 segments[i].mesh.triangles = segments[i].mesh.triangles.Reverse().ToArray();
             }
-            if(useFlatShading)
-            {
-                segments[i] = flatShading(segments[i]);
-            }
+            
             //NormalData normalData = CalculateNormals(segments[i].mesh.triangles, segments[i].mesh.vertices);
             //segments[i].mesh.normals = normalData.vertexNormals;
 			segments[i].mesh.RecalculateNormals();
@@ -329,22 +330,25 @@ public class sphereMapping : MonoBehaviour {
         return v.normalized;
     }
 
-    private static SegmentData flatShading(SegmentData mesh)
+    private static Mesh flatShading(Mesh mesh)
     {
-        SegmentData temp = mesh;
-        Vector3[] flatVerts = new Vector3[temp.mesh.triangles.Length];
-        Vector2[] flatUVs = new Vector2[temp.mesh.triangles.Length];
+        Mesh temp = new Mesh();
+        Vector3[] flatVerts = new Vector3[mesh.triangles.Length];
+        Vector2[] flatUVs = new Vector2[mesh.triangles.Length];
+        int[] triangles = new int[mesh.triangles.Length];
 
-        for (int i = 0; i < temp.mesh.triangles.Length; i++)
+        for (int i = 0; i < mesh.triangles.Length; i++)
         {
-            flatVerts[i] = temp.mesh.vertices[temp.mesh.triangles[i]];  
-            flatUVs[i] = temp.mesh.uv[temp.mesh.triangles[i]];
-            temp.mesh.triangles[i] = i;
+            flatVerts[i] = mesh.vertices[mesh.triangles[i]];
+            flatUVs[i] = mesh.uv[mesh.triangles[i]];
+            triangles[i] = i;
         }
 
-        temp.mesh.vertices = flatVerts;
-        temp.mesh.uv = flatUVs;
-        return temp;   
+        temp.vertices = flatVerts;
+        temp.uv = flatUVs;
+        temp.triangles = triangles;
+        temp.RecalculateNormals();
+        return temp;
     }
 }
 
