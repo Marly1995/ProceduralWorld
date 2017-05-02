@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -6,14 +6,14 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class sphereMapping : MonoBehaviour {
 
-    public static SegmentData[] getSphere(int divs, int gridSize, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve, TerrainType[] regions)
+    public static SegmentData[] getSphere(int divs, int gridSize, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve, TerrainType[] regions, bool useFlatShading)
     {
-    float radius = 20;
+    float radius = 100;
 
-    return Generate(divs, gridSize, radius, heightMap, heightMultiplier, _heightCurve, regions);
+    return Generate(divs, gridSize, radius, heightMap, heightMultiplier, _heightCurve, regions, useFlatShading);
     }
 
-    public static SegmentData[] Generate(int divs, int gridSize, float radius, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve, TerrainType[] regions)
+    public static SegmentData[] Generate(int divs, int gridSize, float radius, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve, TerrainType[] regions, bool useFlatShading)
     {
         SegmentData[] segments = GenerateVerts(divs, gridSize, radius, heightMap, heightMultiplier, _heightCurve, regions);
 
@@ -24,7 +24,11 @@ public class sphereMapping : MonoBehaviour {
 			Vector3[] sphereNormals = segments[i].mesh.normals;			
 			temp = GenerateTris(gridSize, segments[i].mesh.vertices, divs);
 			temp.uv = segments[i].mesh.uv;
-			segments[i].mesh = temp;
+            if (useFlatShading)
+            {
+                temp = flatShading(temp);
+            }
+            segments[i].mesh = temp;
 
             if (i >= divs * 1 && i < divs * 3)
             {
@@ -34,8 +38,21 @@ public class sphereMapping : MonoBehaviour {
             {
                 segments[i].mesh.triangles = segments[i].mesh.triangles.Reverse().ToArray();
             }
-            NormalData normalData = CalculateNormals(segments[i].mesh.triangles, segments[i].mesh.vertices);
-            segments[i].mesh.normals = normalData.vertexNormals;
+            
+            //NormalData normalData = CalculateNormals(segments[i].mesh.triangles, segments[i].mesh.vertices);
+            //segments[i].mesh.normals = normalData.vertexNormals;
+			segments[i].mesh.RecalculateNormals();
+            //for (int j = 0; j < normalData.triangleNormals.Length / 2; j++)
+            //{
+            //    float b1 = Vector3.Angle(normalData.triangleNormals[j * 2], normalData.sphereNormals[j * 2]);
+            //    float b2 = Vector3.Angle(normalData.triangleNormals[(j * 2) + 1], normalData.sphereNormals[(j * 2) + 1]);
+            //    if (b1 >= regions[5].slope ||
+            //        b2 >= regions[5].slope)
+            //    {
+            //        segments[i].colorMap[j] = regions[5].color;
+            //    }
+            //}
+            segments[i].texture = TextureGenerator.TextureFromColorMap(segments[i].MapData.colorMap, gridSize, gridSize);
         }
 
         return segments;
@@ -137,7 +154,7 @@ public class sphereMapping : MonoBehaviour {
         mesh.vertices = vertices;
         mesh.normals = normals;
 		mesh.uv = uvs;		
-		SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize));
+		SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize), colorMap, heightMap);
         return segment;
     }
 
@@ -177,7 +194,7 @@ public class sphereMapping : MonoBehaviour {
         mesh.vertices = vertices;
         mesh.normals = normals;
 		mesh.uv = uvs;
-        SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize));
+		SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize), colorMap, heightMap);
         return segment;
     }
 
@@ -217,7 +234,7 @@ public class sphereMapping : MonoBehaviour {
         mesh.vertices = vertices;
         mesh.normals = normals;
 		mesh.uv = uvs;
-        SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize));
+		SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize), colorMap, heightMap);
         return segment;
     }
 
@@ -265,7 +282,8 @@ public class sphereMapping : MonoBehaviour {
     {
         Vector3[] vertexNormals = new Vector3[vertices.Length];
         int triangleCount = triangles.Length / 3;
-        Vector3[] triangleNormals = new Vector3[triangleCount];        
+        Vector3[] triangleNormals = new Vector3[triangleCount];
+        Vector3[] sphereNormals = new Vector3[triangleCount];
         for (int i = 0; i < triangleCount; i++)
         {
             int normalTriangleIndex = i * 3;
@@ -274,6 +292,7 @@ public class sphereMapping : MonoBehaviour {
             int vertexIndexC = triangles[normalTriangleIndex + 2];
 
             triangleNormals[i] = SurfaceNormalFromIndices(vertexIndexA, vertexIndexB, vertexIndexC, vertices);
+            sphereNormals[i] = SphereNormalFromIndices(vertexIndexA, vertexIndexB, vertexIndexC, vertices);
             vertexNormals[vertexIndexA] += triangleNormals[i];
             vertexNormals[vertexIndexB] += triangleNormals[i];
             vertexNormals[vertexIndexC] += triangleNormals[i];
@@ -283,7 +302,7 @@ public class sphereMapping : MonoBehaviour {
         {
             vertexNormals[i].Normalize();
         }
-        return new NormalData(vertexNormals, triangleNormals);
+        return new NormalData(vertexNormals, triangleNormals, sphereNormals);
     }
 
     private static Vector3 SurfaceNormalFromIndices(int indexA, int indexB, int indexC, Vector3[] vertices)
@@ -296,16 +315,53 @@ public class sphereMapping : MonoBehaviour {
         Vector3 sideAC = pointC - pointA;
         return Vector3.Cross(sideAB, sideAC).normalized;
     }
+
+    private static Vector3 SphereNormalFromIndices(int indexA, int indexB, int indexC, Vector3[] vertices)
+    {
+        Vector3 pointA = vertices[indexA];
+        Vector3 pointB = vertices[indexB];
+        Vector3 pointC = vertices[indexC];
+
+        float x = (pointA.x + pointB.x + pointC.x) / 3;
+        float y = (pointA.y + pointB.y + pointC.y) / 3;
+        float z = (pointA.z + pointB.z + pointC.z) / 3;
+
+        Vector3 v = new Vector3(x, y, z);
+        return v.normalized;
+    }
+
+    private static Mesh flatShading(Mesh mesh)
+    {
+        Mesh temp = new Mesh();
+        Vector3[] flatVerts = new Vector3[mesh.triangles.Length];
+        Vector2[] flatUVs = new Vector2[mesh.triangles.Length];
+        int[] triangles = new int[mesh.triangles.Length];
+
+        for (int i = 0; i < mesh.triangles.Length; i++)
+        {
+            flatVerts[i] = mesh.vertices[mesh.triangles[i]];
+            flatUVs[i] = mesh.uv[mesh.triangles[i]];
+            triangles[i] = i;
+        }
+
+        temp.vertices = flatVerts;
+        temp.uv = flatUVs;
+        temp.triangles = triangles;
+        temp.RecalculateNormals();
+        return temp;
+    }
 }
 
 public struct NormalData
 {
     public Vector3[] vertexNormals;
     public Vector3[] triangleNormals;
+    public Vector3[] sphereNormals;
 
-    public NormalData(Vector3[] vertexNormals, Vector3[] triangleNormals)
+    public NormalData(Vector3[] vertexNormals, Vector3[] triangleNormals, Vector3[] sphereNormals)
     {
         this.vertexNormals = vertexNormals;
         this.triangleNormals = triangleNormals;
+        this.sphereNormals = sphereNormals;
     }
 }

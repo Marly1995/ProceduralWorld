@@ -1,5 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using LibNoise.Unity;
+using LibNoise;
+using LibNoise.Unity.Generator;
+using LibNoise.Unity.Operator;
 using UnityEngine;
 
 public static class NoiseGeneration
@@ -82,5 +86,24 @@ public static class NoiseGeneration
             }
         }
         return noiseMap;
+    }
+
+    public static float[,] GenerateLibNoiseMap(int mapWidth, int mapHeight, int seed, float scale, int sheets, float persistance, float lacunarity, Vector2 offset)
+    {
+        RiggedMultifractal rmf = new RiggedMultifractal();
+
+        Voronoi vor = new Voronoi();
+
+        Perlin perlin = new Perlin(scale, lacunarity, persistance, sheets, seed, QualityMode.High);
+
+        Const constGen = new Const(0.5f);
+
+        var finalGenerator = new Add(new Multiply(perlin, constGen), new Multiply(rmf, constGen));
+
+        Noise2D noiseGenerator = new Noise2D(mapWidth, mapHeight, finalGenerator);
+
+        noiseGenerator.GeneratePlanar(0f, 1f, 0f, 1f);
+
+        return noiseGenerator.getData();
     }
 }

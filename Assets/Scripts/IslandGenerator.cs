@@ -41,6 +41,7 @@ public class IslandGenerator : MonoBehaviour {
 	public int islandNumber = 5;
 
 	public bool autoUpdate;
+    public bool flat_shading;
 
     public TerrainType[] regions;
 	float[,] falloffMap;
@@ -62,7 +63,7 @@ public class IslandGenerator : MonoBehaviour {
         if (drawMode == DrawMode.NoiseMap) { display.DrawTexture(TextureGenerator.TextureFromHeightMap(mapData[0].heightMap)); }
         else if (drawMode == DrawMode.ColorMap) { display.DrawTexture(TextureGenerator.TextureFromColorMap(mapData[0].colorMap, mapChunkSize, mapChunkSize)); }
         //else if (drawMode == DrawMode.Mesh) { display.DrawMesh(MeshGenerator.GenerateTerrainMesh(mapData[0].heightMap, meshHeightmultiplier, meshHeightCurve, previewLOD), TextureGenerator.TextureFromColorMap(mapData.colorMap, mapChunkSize, mapChunkSize)); }
-        else if (drawMode == DrawMode.Sphere) { display.DrawSphere(sphereMapping.getSphere(i, gridSize, mapData, meshHeightmultiplier, meshHeightCurve, regions), i); }
+        else if (drawMode == DrawMode.Sphere) { display.DrawSphere(sphereMapping.getSphere(i, gridSize, mapData, meshHeightmultiplier, meshHeightCurve, regions, flat_shading), i); }
     }
 
     public void RequestMapData(Vector2 centre, Action<MapData> callback)
@@ -102,26 +103,26 @@ public class IslandGenerator : MonoBehaviour {
         }
     }
 
-    void Update()
-    {
-        if(mapDataThreadQueue.Count > 0)
-        {
-            for (int i = 0; i < mapDataThreadQueue.Count; i++)
-            {
-                MapThreadInfo<MapData> threadInfo = mapDataThreadQueue.Dequeue();
-                threadInfo.callback(threadInfo.parameter);
-            }
-        }
-
-        if (meshDataThreadQueue.Count > 0)
-        {
-            for (int i = 0; i < meshDataThreadQueue.Count; i++)
-            {
-                MapThreadInfo<MeshData> threadInfo = meshDataThreadQueue.Dequeue();
-                threadInfo.callback(threadInfo.parameter);
-            }
-        }
-    }
+//    void Update()
+//    {
+//        if(mapDataThreadQueue.Count > 0)
+//        {
+//            for (int i = 0; i < mapDataThreadQueue.Count; i++)
+//            {
+//                MapThreadInfo<MapData> threadInfo = mapDataThreadQueue.Dequeue();
+//                threadInfo.callback(threadInfo.parameter);
+//            }
+//        }
+//
+//        if (meshDataThreadQueue.Count > 0)
+//        {
+//            for (int i = 0; i < meshDataThreadQueue.Count; i++)
+//            {
+//                MapThreadInfo<MeshData> threadInfo = meshDataThreadQueue.Dequeue();
+//                threadInfo.callback(threadInfo.parameter);
+//            }
+//        }
+//    }
 
     bool checkIslandOverlap(List<Vector2> islands, int x, int y)
     {
@@ -231,6 +232,7 @@ public struct TerrainType
     [Range(0, 1)]
     public float height;
     public Color color;
+    public float slope;
 }
 
 
@@ -250,10 +252,13 @@ public struct SegmentData
 {
     public Mesh mesh;
     public Texture2D texture;
+	public MapData MapData;
 
-    public SegmentData(Mesh mesh, Texture2D texture)
+
+	public SegmentData(Mesh mesh, Texture2D texture, Color[] colorMap, float[,] heightMap)
     {
         this.mesh = mesh;
         this.texture = texture;
+		this.MapData = new MapData(heightMap, colorMap);
     }
 }
