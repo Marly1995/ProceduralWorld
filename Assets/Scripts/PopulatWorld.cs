@@ -6,28 +6,38 @@ public class PopulatWorld : MonoBehaviour {
 
     public SegmentData[] worldData;
     ObjectLocations[] objectLocations;
+    public GameObject villageLocation;
+    public List<SpawnLocation> villageLocations;
     public int gridSize;
 
+    // mountain assets
     public GameObject pineTreeHolder;
     GameObject pineTreeHolderOriginal;
     public GameObject pineTree1;
     public GameObject pineTree2;
 
+    // plains assets
     public GameObject forestTreeHolder;
     GameObject forestTreeHolderOriginal;
     public GameObject forestTree1;
     public GameObject forestTree2;
     public GameObject forestTree3;
 
+    // beach assets
     public GameObject palmTreeHolder;
     GameObject palmTreeHolderOriginal;
     public GameObject palmTree1;
     public GameObject palmTree2;
 
-    public GameObject villageLocation;
-    public List<SpawnLocation> villageLocations;
-
+    // village assets
     public GameObject beachHut1;
+    public GameObject pier;
+    public GameObject walkway;
+
+    // ice village assets
+    public GameObject smallIglu;
+    public GameObject fireIglu;
+
 	// Use this for initialization
 	public void Populate (SegmentData[] segments) {
 		worldData = segments;
@@ -107,9 +117,28 @@ public class PopulatWorld : MonoBehaviour {
     {
         for (int i = 0; i < villageLocations.Count; i++)
         {
-            Instantiate(beachHut1, villageLocations[i].obj.transform.position, Quaternion.identity);
+            GameObject obj = Instantiate(beachHut1, villageLocations[i].obj.transform.position, Quaternion.identity);
+            obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -villageLocations[i].obj.transform.position);
+            objectLocations[villageLocations[i].chunk].space[villageLocations[i].x, villageLocations[i].y] = true;
+            int searchRange = gridSize / 2;
+            for (int x = villageLocations[i].x-searchRange; x < searchRange; x+= searchRange/8)
+            {
+                for (int y = villageLocations[i].y- searchRange; y < searchRange; y+= searchRange/8)
+                {
+                    if (x < gridSize && x >= 0 && y < gridSize && y >= 0)
+                    {
+                        if (objectLocations[villageLocations[i].chunk].height[x, y] >= 100.82f &&
+                            objectLocations[villageLocations[i].chunk].height[x, y] <= 100.99f)
+                        {
+                            GameObject hut = Instantiate(beachHut1, villageLocations[i].obj.transform.position, Quaternion.identity);
+                            hut.transform.rotation = Quaternion.FromToRotation(Vector3.down, -objectLocations[villageLocations[i].chunk].position[x, y]);
+                        }
+                    }
+                }
+            }
         }
     }
+
 	void PopulateTrees()
 	{
 		for (int i = 0; i < worldData.Length; i++) 
