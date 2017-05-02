@@ -95,7 +95,7 @@ public class PopulatWorld : MonoBehaviour {
                             bool spawn = true;
                             for (int k = 0; k < villageLocations.Count; k++)
                             {
-                                if (Vector3.Distance(objectLocations[i].position[x, y], villageLocations[k].obj.transform.position) <= 100.0f)
+                                if (Vector3.Distance(objectLocations[i].position[x, y], villageLocations[k].obj.transform.position) <= Random.Range(80.0f, 100.0f))
                                 {
                                     spawn = false;
                                     break;
@@ -119,8 +119,8 @@ public class PopulatWorld : MonoBehaviour {
         {
             GameObject obj = Instantiate(beachHut1, villageLocations[i].obj.transform.position, Quaternion.identity);
             obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -villageLocations[i].obj.transform.position);
-            objectLocations[villageLocations[i].chunk].space[villageLocations[i].x, villageLocations[i].y] = true;
-            int nextHut = (int)Random.Range(10.0f, 20.0f);
+            obj.transform.SetParent(villageLocations[i].obj.transform);
+            int nextHut = (int)Random.Range(20.0f, 40.0f);
             villageLocations[i].items.Add(obj);
             int searchRange = gridSize / 2;
             for (int x = villageLocations[i].x-gridSize; x < gridSize; x++)
@@ -138,8 +138,10 @@ public class PopulatWorld : MonoBehaviour {
                                 if (!Physics.Raycast(Vector3.zero, objectLocations[villageLocations[i].chunk].position[x, y], Mathf.Infinity))
                                 {
                                     GameObject hut = Instantiate(beachHut1, objectLocations[villageLocations[i].chunk].position[x, y], Quaternion.identity);
+                                    hut.transform.Rotate(new Vector3(0.0f, Random.Range(-10.0f, 10.0f), 0.0f));
                                     hut.transform.rotation = Quaternion.FromToRotation(Vector3.down, -objectLocations[villageLocations[i].chunk].position[x, y]);
-                                    nextHut = (int)Random.Range(10.0f, 20.0f);
+                                    hut.transform.SetParent(villageLocations[i].obj.transform);
+                                    nextHut = (int)Random.Range(20.0f, 40.0f);
                                 }
                             }                   
                         }
