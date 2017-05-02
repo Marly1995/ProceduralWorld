@@ -120,18 +120,28 @@ public class PopulatWorld : MonoBehaviour {
             GameObject obj = Instantiate(beachHut1, villageLocations[i].obj.transform.position, Quaternion.identity);
             obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -villageLocations[i].obj.transform.position);
             objectLocations[villageLocations[i].chunk].space[villageLocations[i].x, villageLocations[i].y] = true;
+            int nextHut = (int)Random.Range(10.0f, 20.0f);
+            villageLocations[i].items.Add(obj);
             int searchRange = gridSize / 2;
-            for (int x = villageLocations[i].x-searchRange; x < searchRange; x+= searchRange/8)
+            for (int x = villageLocations[i].x-gridSize; x < gridSize; x++)
             {
-                for (int y = villageLocations[i].y- searchRange; y < searchRange; y+= searchRange/8)
-                {
+                for (int y = villageLocations[i].y- gridSize; y < gridSize; y++)
+                {                  
                     if (x < gridSize && x >= 0 && y < gridSize && y >= 0)
                     {
+                        nextHut--;
                         if (objectLocations[villageLocations[i].chunk].height[x, y] >= 100.82f &&
                             objectLocations[villageLocations[i].chunk].height[x, y] <= 100.99f)
                         {
-                            GameObject hut = Instantiate(beachHut1, villageLocations[i].obj.transform.position, Quaternion.identity);
-                            hut.transform.rotation = Quaternion.FromToRotation(Vector3.down, -objectLocations[villageLocations[i].chunk].position[x, y]);
+                            if (nextHut <= 0)
+                            {
+                                if (!Physics.Raycast(Vector3.zero, objectLocations[villageLocations[i].chunk].position[x, y], Mathf.Infinity))
+                                {
+                                    GameObject hut = Instantiate(beachHut1, objectLocations[villageLocations[i].chunk].position[x, y], Quaternion.identity);
+                                    hut.transform.rotation = Quaternion.FromToRotation(Vector3.down, -objectLocations[villageLocations[i].chunk].position[x, y]);
+                                    nextHut = (int)Random.Range(10.0f, 20.0f);
+                                }
+                            }                   
                         }
                     }
                 }
@@ -275,6 +285,7 @@ public class PopulatWorld : MonoBehaviour {
     public struct SpawnLocation
     {
         public GameObject obj;
+        public List<GameObject> items;
         public int chunk;
         public int x;
         public int y;
@@ -285,6 +296,7 @@ public class PopulatWorld : MonoBehaviour {
             this.x = x;
             this.y = y;
             this.chunk = chunk;
+            items = new List<GameObject>();
         }
     }
 }
