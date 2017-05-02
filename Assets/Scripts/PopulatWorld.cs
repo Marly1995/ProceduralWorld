@@ -179,13 +179,13 @@ public class PopulatWorld : MonoBehaviour {
         if(Random.Range(0.0f, 2.0f) >= 1.0f)
         {
             GameObject obj = Instantiate(pineTree1, position, Quaternion.identity);
-            obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, position.normalized);
+            obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
             obj.transform.parent = pineTreeHolder.transform;          
         }
         else
         {
             GameObject obj = Instantiate(pineTree2, position, Quaternion.identity);
-            obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, position.normalized);
+            obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
             obj.transform.parent = pineTreeHolder.transform;
         }
     }
@@ -196,19 +196,19 @@ public class PopulatWorld : MonoBehaviour {
         if (picker > 1.0f)
         {
             GameObject obj = Instantiate(forestTree1, position, Quaternion.identity);
-            obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, position.normalized);
+            obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
             obj.transform.parent = forestTreeHolder.transform;
         }
         else if (picker > 2.0f)
         {
             GameObject obj = Instantiate(forestTree2, position, Quaternion.identity);
-            obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, position.normalized);
+            obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
             obj.transform.parent = forestTreeHolder.transform;
         }
         else
         {
             GameObject obj = Instantiate(forestTree3, position, Quaternion.identity);
-            obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, position.normalized);
+            obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
             obj.transform.parent = forestTreeHolder.transform;
         }
     }
@@ -218,13 +218,13 @@ public class PopulatWorld : MonoBehaviour {
         if (Random.Range(0.0f, 2.0f) >= 1.0f)
         {
             GameObject obj = Instantiate(palmTree1, position, Quaternion.identity);
-            obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, position.normalized);
+            obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
             obj.transform.parent = palmTreeHolder.transform;
         }
         else
         {
             GameObject obj = Instantiate(palmTree2, position, Quaternion.identity);
-            obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, position.normalized);
+            obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
             obj.transform.parent = palmTreeHolder.transform;
         }
     }
