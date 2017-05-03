@@ -55,16 +55,18 @@ public class PopulatWorld : MonoBehaviour {
         forestTreeHolder = Instantiate(forestTreeHolder);
         palmTreeHolder = Instantiate(palmTreeHolder);
 
-		PopulateTrees();
-
-        pineTreeHolder = pineTreeHolderOriginal;
-        palmTreeHolder = palmTreeHolderOriginal;
-        forestTreeHolder = forestTreeHolderOriginal;
+        PopulateWorld();
 
         LocateVillageLocations();
 
         PopulateTikiVillages();
         PopulateIgluVillages();
+
+        PopulateTrees();
+
+        pineTreeHolder = pineTreeHolderOriginal;
+        palmTreeHolder = palmTreeHolderOriginal;
+        forestTreeHolder = forestTreeHolderOriginal;
     }
 
     void LocateVillageLocations()
@@ -114,7 +116,7 @@ public class PopulatWorld : MonoBehaviour {
                                     break;
                                 }
                             }
-                            if (objectLocations[i].position[x, y].y >= 85.0f)
+                            if (objectLocations[i].position[x, y].y >= 85.0f || objectLocations[i].position[x, y].y <= -85.0f)
                             {
                                 if (igluspawn == true && x > 10 && x < 40 && y > 10 && y < 40)
                                 {
@@ -122,7 +124,7 @@ public class PopulatWorld : MonoBehaviour {
                                     igluLocations.Add(new SpawnLocation(x, y, i, igluVillage));
                                 }
                             }
-                            else if (objectLocations[i].position[x, y].y <= 60.0f)
+                            else if (objectLocations[i].position[x, y].y <= 70.0f && objectLocations[i].position[x, y].y >= -70.0f)
                             {
                                 if (tikispawn == true)
                                 {
@@ -237,33 +239,48 @@ public class PopulatWorld : MonoBehaviour {
         }
     }
 
+    void PopulateWorld()
+    {
+        for (int i = 0; i < worldData.Length; i++)
+        {
+            int index = 0;
+            objectLocations[i] = new ObjectLocations(gridSize);
+            for (int x = 0; x < gridSize; x++)
+            {
+                for (int y = 0; y < gridSize; y++)
+                {
+                    Vector3 position = worldData[i].mesh.vertices[worldData[i].mesh.triangles[index * 6]];
+                    float height = position.magnitude;
+
+                    objectLocations[i].position[x, y] = position;
+                    objectLocations[i].height[x, y] = height;
+                    index++;
+                }
+            }
+        }
+    }
+
 	void PopulateTrees()
 	{
-		for (int i = 0; i < worldData.Length; i++) 
-		{
-			int index = 0;
+        for (int i = 0; i < worldData.Length; i++)
+        {
+            int index = 0;
 			int pineTreeCountdown = 0;
             int forestTreeCountdown = 0;
             int palmTreeCountdown = 0;
-            objectLocations[i] = new ObjectLocations(gridSize);
 
             for (int x = 0; x < gridSize; x++) 
 			{
 				for (int y = 0; y < gridSize; y++) 
 				{
-					Vector3 position = worldData [i].mesh.vertices [worldData [i].mesh.triangles [index * 6]];
-                    float height = position.magnitude;
-
-                    objectLocations[i].position[x, y] = position;
-                    objectLocations[i].height[x, y] = height;
-
                     // PINE TREES
-                    if (height >= 101.0f &&
-                        height <= 101.4f)
+                    if (objectLocations[i].height[x, y] >= 101.0f &&
+                        objectLocations[i].height[x, y] <= 101.4f)
                     {
-                        if (pineTreeCountdown <= 0)
+                        if (pineTreeCountdown <= 0 &&
+                            !Physics.Raycast(Vector3.zero, objectLocations[i].position[x, y], Mathf.Infinity))
                         {
-                            SpawnPineTree(position);
+                            SpawnPineTree(objectLocations[i].position[x, y]);
                             pineTreeCountdown = (int)Random.Range(2.0f, 6.0f);
                             objectLocations[i].space[x, y] = true;
                         }
@@ -271,24 +288,26 @@ public class PopulatWorld : MonoBehaviour {
                     }
 
                     // FOREST TREES
-                    if (height >= 100.82f &&
-                        height <= 100.99f)
+                    if (objectLocations[i].height[x, y] >= 100.82f &&
+                        objectLocations[i].height[x, y] <= 100.99f)
                     {
-                        if (forestTreeCountdown <= 0)
+                        if (forestTreeCountdown <= 0 &&
+                            !Physics.Raycast(Vector3.zero, objectLocations[i].position[x, y], Mathf.Infinity))
                         {
-                            SpawnForestTree(position);
+                            SpawnForestTree(objectLocations[i].position[x, y]);
                             forestTreeCountdown = (int)Random.Range(20.0f, 60.0f);
                             objectLocations[i].space[x, y] = true;
                         }
                         forestTreeCountdown--;
                     }
 
-                    if (height >= 100.4f &&
-                       height <= 100.6f)
+                    if (objectLocations[i].height[x, y] >= 100.4f &&
+                       objectLocations[i].height[x, y] <= 100.6f)
                     {
-                        if (palmTreeCountdown <= 0)
+                        if (palmTreeCountdown <= 0 &&
+                            !Physics.Raycast(Vector3.zero, objectLocations[i].position[x, y], Mathf.Infinity))
                         {
-                            SpawnPalmTree(position);
+                            SpawnPalmTree(objectLocations[i].position[x, y]);
                             palmTreeCountdown = (int)Random.Range(10.0f, 30.0f);
                             objectLocations[i].space[x, y] = true;
                         }

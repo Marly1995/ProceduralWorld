@@ -184,7 +184,7 @@ public class sphereMapping : MonoBehaviour {
                 {
                     if (currentHeight <= regions[j].height)
                     {
-                        colorMap[index] = regions[j].color;
+                        colorMap[index] = regions[j].iceColor;
                         index++;
                         break;
                     }

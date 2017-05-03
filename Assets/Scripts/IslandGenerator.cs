@@ -232,6 +232,7 @@ public struct TerrainType
     [Range(0, 1)]
     public float height;
     public Color color;
+    public Color iceColor;
     public float slope;
 }
 
