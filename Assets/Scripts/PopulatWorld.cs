@@ -210,182 +210,45 @@ public class PopulatWorld : MonoBehaviour {
             List<GameObject> iglus = new List<GameObject>();
             iglus.Add(Instantiate(fireIglu, igluLocations[i].obj.transform.position * 1.005f, Quaternion.identity));
             iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
-            int nextIglu = (int)Random.Range(20.0f, 40.0f);
             igluLocations[i].items.Add(iglus[iglus.Count - 1]);
-            for (int x = igluLocations[i].x - gridSize/2; x < gridSize/2; x++)
+            for (int x = igluLocations[i].x - gridSize; x < gridSize; x++)
             {
-                for (int y = igluLocations[i].y - gridSize/2; y < gridSize/2; y++)
-                {
-                    if (x >= gridSize && y >= 0 && y < gridSize)
+                for (int y = igluLocations[i].y - gridSize; y < gridSize; y++)
+                {                    
+                    if (x >= 0 && x < gridSize && y >= 0 && y < gridSize)
                     {
-                        nextIglu--;
-                        int newx = x - gridSize;
-                        if (objectLocations[igluLocations[i].chunk+1].height[newx, y] >= 100.82f &&
-                            objectLocations[igluLocations[i].chunk+1].height[newx, y] <= 100.99f)
-                        {
-                            if (nextIglu <= 0)
-                            {
-                                if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk+1].position[newx, y], Mathf.Infinity))
-                                {
-                                    iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk+1].position[newx, y] * 1.005f, Quaternion.identity));
-                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
-                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
-                                    nextIglu = (int)Random.Range(20.0f, 40.0f);
-                                }
-                            }
-                        }
-                    }
-                    else if(x < 0 && y >= 0 && y < gridSize)
-                    {
-                        nextIglu--;
-                        int newx = gridSize + x;
-                        if (objectLocations[igluLocations[i].chunk-1].height[newx, y] >= 100.82f &&
-                            objectLocations[igluLocations[i].chunk-1].height[newx, y] <= 100.99f)
-                        {
-                            if (nextIglu <= 0)
-                            {
-                                if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk - 1].position[newx, y], Mathf.Infinity))
-                                {
-                                    iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk - 1].position[newx, y] * 1.005f, Quaternion.identity));
-                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
-                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
-                                    nextIglu = (int)Random.Range(20.0f, 40.0f);
-                                }
-                            }
-                        }
-                    }
-                    else if (x < 0 && y < 0)
-                    {
-                        nextIglu--;
-                        int newx = gridSize + x;
-                        int newy = gridSize + y;
-                        if (objectLocations[igluLocations[i].chunk - 5].height[newx, newy] >= 100.82f &&
-                            objectLocations[igluLocations[i].chunk - 5].height[newx, newy] <= 100.99f)
-                        {
-                            if (nextIglu <= 0)
-                            {
-                                if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk - 5].position[newx, newy], Mathf.Infinity))
-                                {
-                                    iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk - 5].position[newx, newy] * 1.005f, Quaternion.identity));
-                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
-                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
-                                    nextIglu = (int)Random.Range(20.0f, 40.0f);
-                                }
-                            }
-                        }
-                    }
-                    else if (x >= gridSize && y >= gridSize)
-                    {
-                        nextIglu--;
-                        int newx = x - gridSize;
-                        int newy = y - gridSize;
-                        if (objectLocations[igluLocations[i].chunk + 5].height[newx, newy] >= 100.82f &&
-                            objectLocations[igluLocations[i].chunk + 5].height[newx, newy] <= 100.99f)
-                        {
-                            if (nextIglu <= 0)
-                            {
-                                if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk + 5].position[newx, newy], Mathf.Infinity))
-                                {
-                                    iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk + 5].position[newx, newy] * 1.005f, Quaternion.identity));
-                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
-                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
-                                    nextIglu = (int)Random.Range(20.0f, 40.0f);
-                                }
-                            }
-                        }
-                    }
-                    else if(y >= gridSize && x >= 0 && x < gridSize)
-                    {
-                        nextIglu--;
-                        int newy = y - gridSize;
-                        if (objectLocations[igluLocations[i].chunk+4].height[x, newy] >= 100.82f &&
-                            objectLocations[igluLocations[i].chunk+4].height[x, newy] <= 100.99f)
-                        {
-                            if (nextIglu <= 0)
-                            {
-                                if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk+4].position[x, newy], Mathf.Infinity))
-                                {
-                                    iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk+4].position[x, newy] * 1.005f, Quaternion.identity));
-                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
-                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
-                                    nextIglu = (int)Random.Range(20.0f, 40.0f);
-                                }
-                            }
-                        }
-                    }
-                    else if(y < 0 && x >= 0 && x < gridSize)
-                    {
-                        nextIglu--;
-                        int newy = gridSize + y;
-                        if (objectLocations[igluLocations[i].chunk-4].height[x, newy] >= 100.82f &&
-                            objectLocations[igluLocations[i].chunk-4].height[x, newy] <= 100.99f)
-                        {
-                            if (nextIglu <= 0)
-                            {
-                                if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk-4].position[x, newy], Mathf.Infinity))
-                                {
-                                    iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk-4].position[x, newy] * 1.005f, Quaternion.identity));
-                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
-                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
-                                    nextIglu = (int)Random.Range(20.0f, 40.0f);
-                                }
-                            }
-                        }
-                    }
-                    else if (x >= gridSize && y < 0)
-                    {
-                        nextIglu--;
-                        int newx = x-gridSize;
-                        int newy = gridSize + y;
-                        if (objectLocations[igluLocations[i].chunk - 3].height[newx, newy] >= 100.82f &&
-                            objectLocations[igluLocations[i].chunk - 3].height[newx, newy] <= 100.99f)
-                        {
-                            if (nextIglu <= 0)
-                            {
-                                if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk - 3].position[newx, newy], Mathf.Infinity))
-                                {
-                                    iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk - 3].position[newx, newy] * 1.005f, Quaternion.identity));
-                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
-                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
-                                    nextIglu = (int)Random.Range(20.0f, 40.0f);
-                                }
-                            }
-                        }
-                    }
-                    else if (x < 0 && y >= gridSize)
-                    {
-                        nextIglu--;
-                        int newx = x + gridSize;
-                        int newy = gridSize - y;
-                        if (objectLocations[igluLocations[i].chunk + 3].height[newx, newy] >= 100.82f &&
-                            objectLocations[igluLocations[i].chunk + 3].height[newx, newy] <= 100.99f)
-                        {
-                            if (nextIglu <= 0)
-                            {
-                                if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk + 3].position[newx, newy], Mathf.Infinity))
-                                {
-                                    iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk + 3].position[newx, newy] * 1.005f, Quaternion.identity));
-                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
-                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
-                                    nextIglu = (int)Random.Range(20.0f, 40.0f);
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        nextIglu--;
                         if (objectLocations[igluLocations[i].chunk].height[x, y] >= 100.82f &&
                             objectLocations[igluLocations[i].chunk].height[x, y] <= 100.99f)
                         {
-                            if (nextIglu <= 0)
+                            if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk].position[x, y], Mathf.Infinity))
                             {
-                                if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk].position[x, y], Mathf.Infinity))
+                                if (Vector3.Distance(objectLocations[igluLocations[i].chunk].position[x, y] * 1.005f, iglus[0].transform.position) <= 10.0f)
                                 {
                                     iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk].position[x, y] * 1.005f, Quaternion.identity));
                                     iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
                                     iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
-                                    nextIglu = (int)Random.Range(20.0f, 40.0f);
+                                }
+                            }                            
+                        }
+                    }
+                }                
+            }
+            for (int k = igluLocations[i].chunk - 4; k < igluLocations[i].chunk + 4; k++)
+            {
+                for (int x = 0; x < gridSize; x++)
+                {
+                    for (int y = 0; y < gridSize; y++)
+                    {
+                        if (objectLocations[k].height[x, y] >= 100.82f &&
+                            objectLocations[k].height[x, y] <= 100.99f)
+                        {
+                            if (!Physics.Raycast(Vector3.zero, objectLocations[k].position[x, y], Mathf.Infinity))
+                            {
+                                if (Vector3.Distance(objectLocations[k].position[x, y] * 1.005f, iglus[0].transform.position) <= 10.0f)
+                                {
+                                    iglus.Add(Instantiate(smallIglu, objectLocations[k].position[x, y] * 1.005f, Quaternion.identity));
+                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
+                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
                                 }
                             }
                         }
