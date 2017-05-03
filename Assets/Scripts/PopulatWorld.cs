@@ -118,7 +118,7 @@ public class PopulatWorld : MonoBehaviour {
         for (int i = 0; i < villageLocations.Count; i++)
         {
             List<GameObject> huts = new List<GameObject>();
-            huts.Add(Instantiate(beachHut1, villageLocations[i].obj.transform.position, Quaternion.identity));
+            huts.Add(Instantiate(beachHut1, villageLocations[i].obj.transform.position * 1.005f, Quaternion.identity));
             huts[huts.Count - 1].transform.SetParent(villageLocations[i].obj.transform);
             int nextHut = (int)Random.Range(20.0f, 40.0f);
             villageLocations[i].items.Add(huts[huts.Count - 1]);
@@ -137,7 +137,7 @@ public class PopulatWorld : MonoBehaviour {
                             {
                                 if (!Physics.Raycast(Vector3.zero, objectLocations[villageLocations[i].chunk].position[x, y], Mathf.Infinity))
                                 {
-                                    huts.Add(Instantiate(beachHut1, objectLocations[villageLocations[i].chunk].position[x, y], Quaternion.identity));
+                                    huts.Add(Instantiate(beachHut1, objectLocations[villageLocations[i].chunk].position[x, y] * 1.005f, Quaternion.identity));
                                     huts[huts.Count - 1].transform.SetParent(villageLocations[i].obj.transform);
                                     nextHut = (int)Random.Range(20.0f, 40.0f);
                                 }
@@ -158,15 +158,22 @@ public class PopulatWorld : MonoBehaviour {
                         ignores[j] = true;
                         ignores[k] = true;
                         huts[j].transform.LookAt(huts[k].transform.position, huts[j].transform.position);
-                        for (float p = 0; p < dist-2; p+= 1.5f)
+                        for (float p = 0; p < dist-2.0f; p+= 1.5f)
                         {
                             if(p>=6) { break; }
-                            Vector3 pos = Vector3.Lerp(huts[j].transform.position, huts[k].transform.position, p / (dist / 1.5f));
-                            GameObject way = Instantiate(walkway, pos, huts[j].transform.rotation);
+                            Vector3 pos = Vector3.Lerp(huts[j].transform.position, huts[k].transform.position, p / ((dist+1.0f) / 1.5f));
+                            GameObject way = Instantiate(walkway, pos * 0.998f, huts[j].transform.rotation);
                             way.transform.SetParent(huts[j].transform);
                         }                       
-                        huts[k].transform.LookAt(huts[j].transform.position, huts[k].transform.position);
-                    }
+                        huts[k].transform.LookAt(huts[j].transform.position, huts[k].transform.position);          
+                    }                    
+                }
+            }
+            for (int j = 0; j < ignores.Length; j++)
+            {
+                if(!ignores[j])
+                {
+                    huts[j].transform.rotation = Quaternion.FromToRotation(Vector3.down, -huts[j].transform.position);
                 }
             }
         }
