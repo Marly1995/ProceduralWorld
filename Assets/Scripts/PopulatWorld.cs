@@ -212,13 +212,14 @@ public class PopulatWorld : MonoBehaviour {
                         } 
                         else 
                         {
+                            //huts[j].transform.LookAt(huts[k].transform.position, huts[j].transform.position);
                             huts[k].transform.LookAt(huts[j].transform.position, huts[k].transform.position);
                             for (float p = 0; p < dist - 2.0f; p += 1.5f) 
                             {
                                 if (p >= 6) { break; }
-                                Vector3 pos = Vector3.Lerp(huts[j].transform.position, huts[k].transform.position, p / ((dist + 1.0f) / 1.5f));
+                                Vector3 pos = Vector3.Lerp(huts[k].transform.position, huts[j].transform.position, p / ((dist + 1.0f) / 1.5f));
                                 GameObject way = Instantiate(walkway, pos * 0.998f, huts[k].transform.rotation);
-                                way.transform.SetParent(huts[j].transform);
+                                way.transform.SetParent(huts[k].transform);
                             }                        
                         }    
                     }                    
@@ -227,8 +228,11 @@ public class PopulatWorld : MonoBehaviour {
             for (int j = 0; j < ignores.Length; j++)
             {
                 if(!ignores[j])
-                {
+                {                   
                     huts[j].transform.rotation = Quaternion.FromToRotation(Vector3.down, -huts[j].transform.position);
+                    GameObject extra = Instantiate(tikiStatue, (huts[j].transform.position + new Vector3(0.0f, 0.0f, 5.0f)) * 0.99f , Quaternion.identity);
+                    extra.transform.rotation = Quaternion.FromToRotation(Vector3.down, -huts[j].transform.position);
+                    extra.transform.rotation = Quaternion.LookRotation(extra.transform.position, -huts[j].transform.position);
                 }
             }
         }
