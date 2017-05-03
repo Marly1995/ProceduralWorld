@@ -198,15 +198,29 @@ public class PopulatWorld : MonoBehaviour {
                             ignores[j] = true;
                         }
                         ignores[k] = true;
-                        huts[j].transform.LookAt(huts[k].transform.position, huts[j].transform.position);
-                        for (float p = 0; p < dist-2.0f; p+= 1.5f)
+                        if (j > 0) 
                         {
-                            if(p>=6) { break; }
-                            Vector3 pos = Vector3.Lerp(huts[j].transform.position, huts[k].transform.position, p / ((dist+1.0f) / 1.5f));
-                            GameObject way = Instantiate(walkway, pos * 0.998f, huts[j].transform.rotation);
-                            way.transform.SetParent(huts[j].transform);
-                        }                       
-                        huts[k].transform.LookAt(huts[j].transform.position, huts[k].transform.position);          
+                            huts[j].transform.LookAt(huts[k].transform.position, huts[j].transform.position);
+                            for (float p = 0; p < dist - 2.0f; p += 1.5f) 
+                            {
+                                if (p >= 6) { break; }
+                                Vector3 pos = Vector3.Lerp(huts[j].transform.position, huts[k].transform.position, p / ((dist + 1.0f) / 1.5f));
+                                GameObject way = Instantiate(walkway, pos * 0.998f, huts[j].transform.rotation);
+                                way.transform.SetParent(huts[j].transform);
+                            }
+                            huts[k].transform.LookAt(huts[j].transform.position, huts[k].transform.position);
+                        } 
+                        else 
+                        {
+                            huts[k].transform.LookAt(huts[j].transform.position, huts[k].transform.position);
+                            for (float p = 0; p < dist - 2.0f; p += 1.5f) 
+                            {
+                                if (p >= 6) { break; }
+                                Vector3 pos = Vector3.Lerp(huts[j].transform.position, huts[k].transform.position, p / ((dist + 1.0f) / 1.5f));
+                                GameObject way = Instantiate(walkway, pos * 0.998f, huts[k].transform.rotation);
+                                way.transform.SetParent(huts[j].transform);
+                            }                        
+                        }    
                     }                    
                 }
             }
