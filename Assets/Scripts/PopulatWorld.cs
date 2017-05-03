@@ -6,8 +6,10 @@ public class PopulatWorld : MonoBehaviour {
 
     public SegmentData[] worldData;
     ObjectLocations[] objectLocations;
-    public GameObject villageLocation;
-    public List<SpawnLocation> villageLocations;
+    public GameObject tikiLocation;
+    public GameObject igluLocation;
+    public List<SpawnLocation> tikiLocations;
+    public List<SpawnLocation> igluLocations;
     public int gridSize;
 
     // mountain assets
@@ -42,7 +44,8 @@ public class PopulatWorld : MonoBehaviour {
 	public void Populate (SegmentData[] segments) {
 		worldData = segments;
         objectLocations = new ObjectLocations[segments.Length];
-        villageLocations = new List<SpawnLocation>();
+        tikiLocations = new List<SpawnLocation>();
+        igluLocations = new List<SpawnLocation>();
 
         pineTreeHolderOriginal = pineTreeHolder;
         palmTreeHolderOriginal = palmTreeHolder;
@@ -60,24 +63,25 @@ public class PopulatWorld : MonoBehaviour {
 
         LocateVillageLocations();
 
-        PopulateVillages();
+        PopulateTikiVillages();
+        PopulateIgluVillages();
     }
 
     void LocateVillageLocations()
     {
         for (int i = 0; i < worldData.Length; i++)
         {
-            for (int x = 0; x < gridSize; x+=gridSize/4)
+            for (int x = 0; x < gridSize; x += gridSize / 4)
             {
-                for (int y = 0; y < gridSize; y+=gridSize/4)
+                for (int y = 0; y < gridSize; y += gridSize / 4)
                 {
-                    if (objectLocations[i].height[x,y] >= 100.82f &&
-                        objectLocations[i].height[x,y] <= 100.99f)
+                    if (objectLocations[i].height[x, y] >= 100.82f &&
+                        objectLocations[i].height[x, y] <= 100.99f)
                     {
                         int terraincheck = 0;
-                        for (int o = x-gridSize/4; o < x+gridSize/4; o++)
+                        for (int o = x - gridSize / 4; o < x + gridSize / 4; o++)
                         {
-                            for (int p = y-gridSize/4; p < y+gridSize/4; p++)
+                            for (int p = y - gridSize / 4; p < y + gridSize / 4; p++)
                             {
                                 if (o < gridSize && o >= 0 && p < gridSize && p >= 0)
                                 {
@@ -92,53 +96,73 @@ public class PopulatWorld : MonoBehaviour {
 
                         if (terraincheck >= (gridSize / 8) * (gridSize / 8))
                         {
-                            bool spawn = true;
-                            for (int k = 0; k < villageLocations.Count; k++)
+                            bool tikispawn = true;
+                            bool igluspawn = true;
+                            for (int k = 0; k < tikiLocations.Count; k++)
                             {
-                                if (Vector3.Distance(objectLocations[i].position[x, y], villageLocations[k].obj.transform.position) <= Random.Range(80.0f, 100.0f))
+                                if (Vector3.Distance(objectLocations[i].position[x, y], tikiLocations[k].obj.transform.position) <= Random.Range(80.0f, 100.0f))
                                 {
-                                    spawn = false;
+                                    tikispawn = false;
                                     break;
                                 }
                             }
-                            if (spawn == true)
+                            for (int k = 0; k < igluLocations.Count; k++)
                             {
-                                GameObject village = Instantiate(villageLocation, objectLocations[i].position[x, y], Quaternion.identity);
-                                villageLocations.Add(new SpawnLocation(x, y, i, village));
+                                if (Vector3.Distance(objectLocations[i].position[x, y], igluLocations[k].obj.transform.position) <= Random.Range(80.0f, 100.0f))
+                                {
+                                    igluspawn = false;
+                                    break;
+                                }
+                            }
+                            if (objectLocations[i].position[x, y].y >= 85.0f)
+                            {
+                                if (igluspawn == true)
+                                {
+                                    GameObject igluVillage = Instantiate(igluLocation, objectLocations[i].position[x, y], Quaternion.identity);
+                                    igluLocations.Add(new SpawnLocation(x, y, i, igluVillage));
+                                }
+                            }
+                            else if (objectLocations[i].position[x, y].y <= 60.0f)
+                            {
+                                if (tikispawn == true)
+                                {
+                                    GameObject tikiVillage = Instantiate(tikiLocation, objectLocations[i].position[x, y], Quaternion.identity);
+                                    tikiLocations.Add(new SpawnLocation(x, y, i, tikiVillage));
+                                }
                             }
                         }
                     }
                 }
             }
-       }
+        }
     }
 
-    void PopulateVillages()
+    void PopulateTikiVillages()
     {
-        for (int i = 0; i < villageLocations.Count; i++)
+        for (int i = 0; i < tikiLocations.Count; i++)
         {
             List<GameObject> huts = new List<GameObject>();
-            huts.Add(Instantiate(beachHut1, villageLocations[i].obj.transform.position * 1.005f, Quaternion.identity));
-            huts[huts.Count - 1].transform.SetParent(villageLocations[i].obj.transform);
+            huts.Add(Instantiate(beachHut1, tikiLocations[i].obj.transform.position * 1.005f, Quaternion.identity));
+            huts[huts.Count - 1].transform.SetParent(tikiLocations[i].obj.transform);
             int nextHut = (int)Random.Range(20.0f, 40.0f);
-            villageLocations[i].items.Add(huts[huts.Count - 1]);
+            tikiLocations[i].items.Add(huts[huts.Count - 1]);
             int searchRange = gridSize / 2;
-            for (int x = villageLocations[i].x - gridSize; x < gridSize; x++)
+            for (int x = tikiLocations[i].x - gridSize; x < gridSize; x++)
             {
-                for (int y = villageLocations[i].y - gridSize; y < gridSize; y++)
+                for (int y = tikiLocations[i].y - gridSize; y < gridSize; y++)
                 {
                     if (x < gridSize && x >= 0 && y < gridSize && y >= 0)
                     {
                         nextHut--;
-                        if (objectLocations[villageLocations[i].chunk].height[x, y] >= 100.82f &&
-                            objectLocations[villageLocations[i].chunk].height[x, y] <= 100.99f)
+                        if (objectLocations[tikiLocations[i].chunk].height[x, y] >= 100.82f &&
+                            objectLocations[tikiLocations[i].chunk].height[x, y] <= 100.99f)
                         {
                             if (nextHut <= 0)
                             {
-                                if (!Physics.Raycast(Vector3.zero, objectLocations[villageLocations[i].chunk].position[x, y], Mathf.Infinity))
+                                if (!Physics.Raycast(Vector3.zero, objectLocations[tikiLocations[i].chunk].position[x, y], Mathf.Infinity))
                                 {
-                                    huts.Add(Instantiate(beachHut1, objectLocations[villageLocations[i].chunk].position[x, y] * 1.005f, Quaternion.identity));
-                                    huts[huts.Count - 1].transform.SetParent(villageLocations[i].obj.transform);
+                                    huts.Add(Instantiate(beachHut1, objectLocations[tikiLocations[i].chunk].position[x, y] * 1.005f, Quaternion.identity));
+                                    huts[huts.Count - 1].transform.SetParent(tikiLocations[i].obj.transform);
                                     nextHut = (int)Random.Range(20.0f, 40.0f);
                                 }
                             }
@@ -174,6 +198,198 @@ public class PopulatWorld : MonoBehaviour {
                 if(!ignores[j])
                 {
                     huts[j].transform.rotation = Quaternion.FromToRotation(Vector3.down, -huts[j].transform.position);
+                }
+            }
+        }
+    }
+
+    void PopulateIgluVillages()
+    {
+        for (int i = 0; i < igluLocations.Count; i++)
+        {
+            List<GameObject> iglus = new List<GameObject>();
+            iglus.Add(Instantiate(fireIglu, igluLocations[i].obj.transform.position * 1.005f, Quaternion.identity));
+            iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
+            int nextIglu = (int)Random.Range(20.0f, 40.0f);
+            igluLocations[i].items.Add(iglus[iglus.Count - 1]);
+            for (int x = igluLocations[i].x - gridSize/2; x < gridSize/2; x++)
+            {
+                for (int y = igluLocations[i].y - gridSize/2; y < gridSize/2; y++)
+                {
+                    if (x >= gridSize && y >= 0 && y < gridSize)
+                    {
+                        nextIglu--;
+                        int newx = x - gridSize;
+                        if (objectLocations[igluLocations[i].chunk+1].height[newx, y] >= 100.82f &&
+                            objectLocations[igluLocations[i].chunk+1].height[newx, y] <= 100.99f)
+                        {
+                            if (nextIglu <= 0)
+                            {
+                                if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk+1].position[newx, y], Mathf.Infinity))
+                                {
+                                    iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk+1].position[newx, y] * 1.005f, Quaternion.identity));
+                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
+                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
+                                    nextIglu = (int)Random.Range(20.0f, 40.0f);
+                                }
+                            }
+                        }
+                    }
+                    else if(x < 0 && y >= 0 && y < gridSize)
+                    {
+                        nextIglu--;
+                        int newx = gridSize + x;
+                        if (objectLocations[igluLocations[i].chunk-1].height[newx, y] >= 100.82f &&
+                            objectLocations[igluLocations[i].chunk-1].height[newx, y] <= 100.99f)
+                        {
+                            if (nextIglu <= 0)
+                            {
+                                if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk - 1].position[newx, y], Mathf.Infinity))
+                                {
+                                    iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk - 1].position[newx, y] * 1.005f, Quaternion.identity));
+                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
+                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
+                                    nextIglu = (int)Random.Range(20.0f, 40.0f);
+                                }
+                            }
+                        }
+                    }
+                    else if (x < 0 && y < 0)
+                    {
+                        nextIglu--;
+                        int newx = gridSize + x;
+                        int newy = gridSize + y;
+                        if (objectLocations[igluLocations[i].chunk - 5].height[newx, newy] >= 100.82f &&
+                            objectLocations[igluLocations[i].chunk - 5].height[newx, newy] <= 100.99f)
+                        {
+                            if (nextIglu <= 0)
+                            {
+                                if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk - 5].position[newx, newy], Mathf.Infinity))
+                                {
+                                    iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk - 5].position[newx, newy] * 1.005f, Quaternion.identity));
+                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
+                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
+                                    nextIglu = (int)Random.Range(20.0f, 40.0f);
+                                }
+                            }
+                        }
+                    }
+                    else if (x >= gridSize && y >= gridSize)
+                    {
+                        nextIglu--;
+                        int newx = x - gridSize;
+                        int newy = y - gridSize;
+                        if (objectLocations[igluLocations[i].chunk + 5].height[newx, newy] >= 100.82f &&
+                            objectLocations[igluLocations[i].chunk + 5].height[newx, newy] <= 100.99f)
+                        {
+                            if (nextIglu <= 0)
+                            {
+                                if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk + 5].position[newx, newy], Mathf.Infinity))
+                                {
+                                    iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk + 5].position[newx, newy] * 1.005f, Quaternion.identity));
+                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
+                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
+                                    nextIglu = (int)Random.Range(20.0f, 40.0f);
+                                }
+                            }
+                        }
+                    }
+                    else if(y >= gridSize && x >= 0 && x < gridSize)
+                    {
+                        nextIglu--;
+                        int newy = y - gridSize;
+                        if (objectLocations[igluLocations[i].chunk+4].height[x, newy] >= 100.82f &&
+                            objectLocations[igluLocations[i].chunk+4].height[x, newy] <= 100.99f)
+                        {
+                            if (nextIglu <= 0)
+                            {
+                                if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk+4].position[x, newy], Mathf.Infinity))
+                                {
+                                    iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk+4].position[x, newy] * 1.005f, Quaternion.identity));
+                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
+                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
+                                    nextIglu = (int)Random.Range(20.0f, 40.0f);
+                                }
+                            }
+                        }
+                    }
+                    else if(y < 0 && x >= 0 && x < gridSize)
+                    {
+                        nextIglu--;
+                        int newy = gridSize + y;
+                        if (objectLocations[igluLocations[i].chunk-4].height[x, newy] >= 100.82f &&
+                            objectLocations[igluLocations[i].chunk-4].height[x, newy] <= 100.99f)
+                        {
+                            if (nextIglu <= 0)
+                            {
+                                if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk-4].position[x, newy], Mathf.Infinity))
+                                {
+                                    iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk-4].position[x, newy] * 1.005f, Quaternion.identity));
+                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
+                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
+                                    nextIglu = (int)Random.Range(20.0f, 40.0f);
+                                }
+                            }
+                        }
+                    }
+                    else if (x >= gridSize && y < 0)
+                    {
+                        nextIglu--;
+                        int newx = x-gridSize;
+                        int newy = gridSize + y;
+                        if (objectLocations[igluLocations[i].chunk - 3].height[newx, newy] >= 100.82f &&
+                            objectLocations[igluLocations[i].chunk - 3].height[newx, newy] <= 100.99f)
+                        {
+                            if (nextIglu <= 0)
+                            {
+                                if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk - 3].position[newx, newy], Mathf.Infinity))
+                                {
+                                    iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk - 3].position[newx, newy] * 1.005f, Quaternion.identity));
+                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
+                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
+                                    nextIglu = (int)Random.Range(20.0f, 40.0f);
+                                }
+                            }
+                        }
+                    }
+                    else if (x < 0 && y >= gridSize)
+                    {
+                        nextIglu--;
+                        int newx = x + gridSize;
+                        int newy = gridSize - y;
+                        if (objectLocations[igluLocations[i].chunk + 3].height[newx, newy] >= 100.82f &&
+                            objectLocations[igluLocations[i].chunk + 3].height[newx, newy] <= 100.99f)
+                        {
+                            if (nextIglu <= 0)
+                            {
+                                if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk + 3].position[newx, newy], Mathf.Infinity))
+                                {
+                                    iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk + 3].position[newx, newy] * 1.005f, Quaternion.identity));
+                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
+                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
+                                    nextIglu = (int)Random.Range(20.0f, 40.0f);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        nextIglu--;
+                        if (objectLocations[igluLocations[i].chunk].height[x, y] >= 100.82f &&
+                            objectLocations[igluLocations[i].chunk].height[x, y] <= 100.99f)
+                        {
+                            if (nextIglu <= 0)
+                            {
+                                if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk].position[x, y], Mathf.Infinity))
+                                {
+                                    iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk].position[x, y] * 1.005f, Quaternion.identity));
+                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
+                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position);
+                                    nextIglu = (int)Random.Range(20.0f, 40.0f);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
