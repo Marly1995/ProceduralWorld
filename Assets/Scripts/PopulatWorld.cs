@@ -117,16 +117,16 @@ public class PopulatWorld : MonoBehaviour {
     {
         for (int i = 0; i < villageLocations.Count; i++)
         {
-            GameObject obj = Instantiate(beachHut1, villageLocations[i].obj.transform.position, Quaternion.identity);
-            obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -villageLocations[i].obj.transform.position);
-            obj.transform.SetParent(villageLocations[i].obj.transform);
+            List<GameObject> huts = new List<GameObject>();
+            huts.Add(Instantiate(beachHut1, villageLocations[i].obj.transform.position, Quaternion.identity));
+            huts[huts.Count - 1].transform.SetParent(villageLocations[i].obj.transform);
             int nextHut = (int)Random.Range(20.0f, 40.0f);
-            villageLocations[i].items.Add(obj);
+            villageLocations[i].items.Add(huts[huts.Count - 1]);
             int searchRange = gridSize / 2;
-            for (int x = villageLocations[i].x-gridSize; x < gridSize; x++)
+            for (int x = villageLocations[i].x - gridSize; x < gridSize; x++)
             {
-                for (int y = villageLocations[i].y- gridSize; y < gridSize; y++)
-                {                  
+                for (int y = villageLocations[i].y - gridSize; y < gridSize; y++)
+                {
                     if (x < gridSize && x >= 0 && y < gridSize && y >= 0)
                     {
                         nextHut--;
@@ -137,14 +137,35 @@ public class PopulatWorld : MonoBehaviour {
                             {
                                 if (!Physics.Raycast(Vector3.zero, objectLocations[villageLocations[i].chunk].position[x, y], Mathf.Infinity))
                                 {
-                                    GameObject hut = Instantiate(beachHut1, objectLocations[villageLocations[i].chunk].position[x, y], Quaternion.identity);
-                                    hut.transform.Rotate(new Vector3(0.0f, Random.Range(-10.0f, 10.0f), 0.0f));
-                                    hut.transform.rotation = Quaternion.FromToRotation(Vector3.down, -objectLocations[villageLocations[i].chunk].position[x, y]);
-                                    hut.transform.SetParent(villageLocations[i].obj.transform);
+                                    huts.Add(Instantiate(beachHut1, objectLocations[villageLocations[i].chunk].position[x, y], Quaternion.identity));
+                                    huts[huts.Count - 1].transform.SetParent(villageLocations[i].obj.transform);
                                     nextHut = (int)Random.Range(20.0f, 40.0f);
                                 }
-                            }                   
+                            }
                         }
+                    }
+                }
+            }
+            bool[] ignores = new bool[huts.Count];
+            for (int j = 0; j < huts.Count; j++)
+            {
+                for (int k = 0; k < huts.Count; k++)
+                {
+                    float dist = Vector3.Distance(huts[j].transform.position, huts[k].transform.position);                   
+                    if (dist <= 10.0f && 
+                        k != j && !ignores[j] && !ignores[k])
+                    {
+                        ignores[j] = true;
+                        ignores[k] = true;
+                        huts[j].transform.LookAt(huts[k].transform.position, huts[j].transform.position);
+                        for (float p = 0; p < dist-2; p+= 1.5f)
+                        {
+                            if(p>=6) { break; }
+                            Vector3 pos = Vector3.Lerp(huts[j].transform.position, huts[k].transform.position, p / (dist / 1.5f));
+                            GameObject way = Instantiate(walkway, pos, huts[j].transform.rotation);
+                            way.transform.SetParent(huts[j].transform);
+                        }                       
+                        huts[k].transform.LookAt(huts[j].transform.position, huts[k].transform.position);
                     }
                 }
             }
