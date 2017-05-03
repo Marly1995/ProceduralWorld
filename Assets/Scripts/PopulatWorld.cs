@@ -24,6 +24,7 @@ public class PopulatWorld : MonoBehaviour {
     public GameObject forestTree1;
     public GameObject forestTree2;
     public GameObject forestTree3;
+    public List<SpawnLocation> forestLocations;
 
     // beach assets
     public GameObject palmTreeHolder;
@@ -46,6 +47,7 @@ public class PopulatWorld : MonoBehaviour {
         objectLocations = new ObjectLocations[segments.Length];
         tikiLocations = new List<SpawnLocation>();
         igluLocations = new List<SpawnLocation>();
+        forestLocations = new List<SpawnLocation>();
 
         pineTreeHolderOriginal = pineTreeHolder;
         palmTreeHolderOriginal = palmTreeHolder;
@@ -244,6 +246,7 @@ public class PopulatWorld : MonoBehaviour {
         for (int i = 0; i < worldData.Length; i++)
         {
             int index = 0;
+            int forestTreeCountdown = 0;
             objectLocations[i] = new ObjectLocations(gridSize);
             for (int x = 0; x < gridSize; x++)
             {
@@ -254,6 +257,34 @@ public class PopulatWorld : MonoBehaviour {
 
                     objectLocations[i].position[x, y] = position;
                     objectLocations[i].height[x, y] = height;
+
+                    if (height >= 100.82f &&
+                        height <= 100.99f &&
+                        position.y <= 70.0f &&
+                        position.y >= -70.0f)
+                    {
+                        if (forestTreeCountdown <= 0)
+                        {
+                            bool spawn = true;
+                            for (int k = 0; k < forestLocations.Count; k++)
+                            {
+                                if(Vector3.Distance(objectLocations[i].position[x, y], forestLocations[k].obj.transform.position) <= 30.0f)
+                                {
+                                    spawn = false;
+                                }
+                            }
+                            if (spawn)
+                            {
+                                GameObject obj = Instantiate(forestTreeHolderOriginal, objectLocations[i].position[x, y], Quaternion.identity);
+                                obj.transform.SetParent(forestTreeHolder.transform);
+                                forestLocations.Add(new SpawnLocation(x, y, i, obj));
+                                forestTreeCountdown = (int)Random.Range(20.0f, 50.0f);
+                                objectLocations[i].space[x, y] = true;
+                            }
+                        }
+                        forestTreeCountdown--;
+                    }
+
                     index++;
                 }
             }
@@ -266,7 +297,7 @@ public class PopulatWorld : MonoBehaviour {
         {
             int index = 0;
 			int pineTreeCountdown = 0;
-            int forestTreeCountdown = 0;
+            int forestTreeCountdown = 0;        
             int palmTreeCountdown = 0;
 
             for (int x = 0; x < gridSize; x++) 
@@ -286,23 +317,32 @@ public class PopulatWorld : MonoBehaviour {
                         }
                         pineTreeCountdown--;
                     }
-
-                    // FOREST TREES
-                    if (objectLocations[i].height[x, y] >= 100.82f &&
-                        objectLocations[i].height[x, y] <= 100.99f)
+                    if(objectLocations[i].height[x, y] >= 100.75f &&
+                        objectLocations[i].height[x, y] <= 100.99f &&
+                       objectLocations[i].position[x, y].y <= 70.0f &&
+                       objectLocations[i].position[x, y].y >= -70.0f)
                     {
-                        if (forestTreeCountdown <= 0 &&
-                            !Physics.Raycast(Vector3.zero, objectLocations[i].position[x, y], Mathf.Infinity))
+                        for (int k = 0; k < forestLocations.Count; k++)
                         {
-                            SpawnForestTree(objectLocations[i].position[x, y]);
-                            forestTreeCountdown = (int)Random.Range(20.0f, 60.0f);
-                            objectLocations[i].space[x, y] = true;
-                        }
-                        forestTreeCountdown--;
+                            if (Vector3.Distance(objectLocations[i].position[x, y], forestLocations[k].obj.transform.position) <= 10.0f)
+                            {
+                                if (forestTreeCountdown <= 0 &&
+                                    !Physics.Raycast(Vector3.zero, objectLocations[i].position[x, y], Mathf.Infinity))
+                                {
+                                    SpawnForestTree(objectLocations[i].position[x, y]);
+                                    forestTreeCountdown = (int)Random.Range(1.0f, 3.0f);
+                                    objectLocations[i].space[x, y] = true;
+                                }
+                                forestTreeCountdown--;
+                            }
+                        }                       
                     }
 
+                    // PALM TREES
                     if (objectLocations[i].height[x, y] >= 100.4f &&
-                       objectLocations[i].height[x, y] <= 100.6f)
+                       objectLocations[i].height[x, y] <= 100.6f &&
+                       objectLocations[i].position[x, y].y <= 70.0f &&
+                       objectLocations[i].position[x, y].y >= -70.0f)
                     {
                         if (palmTreeCountdown <= 0 &&
                             !Physics.Raycast(Vector3.zero, objectLocations[i].position[x, y], Mathf.Infinity))
@@ -318,15 +358,26 @@ public class PopulatWorld : MonoBehaviour {
 				}
 			}
 		}
+
+
 	}
 
     void SpawnPineTree(Vector3 position)
     {
-        if(Random.Range(0.0f, 2.0f) >= 1.0f)
+        if (position.y <= 70.0f && position.y >= -70.0f)
         {
-            GameObject obj = Instantiate(pineTree1, position, Quaternion.identity);
-            obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
-            obj.transform.parent = pineTreeHolder.transform;          
+            if (Random.Range(0.0f, 2.0f) >= 1.0f)
+            {
+                GameObject obj = Instantiate(pineTree1, position, Quaternion.identity);
+                obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
+                obj.transform.parent = pineTreeHolder.transform;
+            }
+            else
+            {
+                GameObject obj = Instantiate(pineTree2, position, Quaternion.identity);
+                obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
+                obj.transform.parent = pineTreeHolder.transform;
+            }
         }
         else
         {
@@ -337,21 +388,21 @@ public class PopulatWorld : MonoBehaviour {
     }
 
     void SpawnForestTree(Vector3 position)
-    {
+    {  
         float picker = Random.Range(0.0f, 3.0f);
-        if (picker > 1.0f)
+        if (picker <= 1.0f)
         {
             GameObject obj = Instantiate(forestTree1, position, Quaternion.identity);
             obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
             obj.transform.parent = forestTreeHolder.transform;
         }
-        else if (picker > 2.0f)
+        else if (picker <= 2.0f)
         {
             GameObject obj = Instantiate(forestTree2, position, Quaternion.identity);
             obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
             obj.transform.parent = forestTreeHolder.transform;
         }
-        else
+        else if (picker <= 3.0f)
         {
             GameObject obj = Instantiate(forestTree3, position, Quaternion.identity);
             obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
