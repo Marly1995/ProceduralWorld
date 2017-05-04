@@ -160,6 +160,7 @@ public class PopulatWorld : MonoBehaviour {
             huts.Add(Instantiate(beachhutLarge, tikiLocations[i].obj.transform.position * 1.005f, Quaternion.identity));
             huts[huts.Count - 1].transform.SetParent(tikiLocations[i].obj.transform);
             int nextHut = (int)Random.Range(20.0f, 40.0f);
+            int nextDock = (int)Random.Range(2.0f, 5.0f);
             tikiLocations[i].items.Add(huts[huts.Count - 1]);
             int searchRange = gridSize / 2;
             for (int x = tikiLocations[i].x - gridSize; x < gridSize; x++)
@@ -181,6 +182,17 @@ public class PopulatWorld : MonoBehaviour {
                                     nextHut = (int)Random.Range(20.0f, 40.0f);
                                 }
                             }
+                        }
+                        if (objectLocations[tikiLocations[i].chunk].height[x, y] >= 100.021f &&
+                            objectLocations[tikiLocations[i].chunk].height[x, y] <= 100.023f) {
+                            if (nextDock <= 0) {
+                                GameObject obj = Instantiate(pier, objectLocations[tikiLocations[i].chunk].position[x, y] * 1.005f, Quaternion.identity);
+                                obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -obj.transform.position);
+                                obj.transform.Rotate(0.0f, Random.Range(-40, 40), 0.0f, Space.Self);
+                                obj.transform.SetParent(tikiLocations[i].obj.transform);
+                                nextDock = (int)Random.Range(2.0f, 5.0f);
+                            }
+                            nextDock--;
                         }
                     }
                 }
@@ -225,14 +237,51 @@ public class PopulatWorld : MonoBehaviour {
                     }                    
                 }
             }
-            for (int j = 0; j < ignores.Length; j++)
-            {
-                if(!ignores[j])
-                {                   
+            for (int j = 0; j < ignores.Length; j++) {
+                if (!ignores[j]) {
+                    int loc = Random.Range(0, 3);
                     huts[j].transform.rotation = Quaternion.FromToRotation(Vector3.down, -huts[j].transform.position);
-                    GameObject extra = Instantiate(tikiStatue, (huts[j].transform.position + new Vector3(0.0f, 0.0f, 5.0f)) * 0.99f , Quaternion.identity);
-                    extra.transform.rotation = Quaternion.FromToRotation(Vector3.down, -huts[j].transform.position);
-                    extra.transform.rotation = Quaternion.LookRotation(extra.transform.position, -huts[j].transform.position);
+                    Vector3 extraPos = Vector3.zero;
+                    switch (loc) {
+                        case 0:
+                            extraPos = huts[j].transform.GetChild(2).transform.position;
+                            break;
+                        case 1:
+                            extraPos = huts[j].transform.GetChild(3).transform.position;
+                            break;
+                        case 2:
+                            extraPos = huts[j].transform.GetChild(4).transform.position;
+                            break;
+                        case 3:
+                            extraPos = huts[j].transform.GetChild(5).transform.position;
+                            break;
+                    }
+                    GameObject extra = Instantiate(tikiStatue, extraPos * 0.995f, Quaternion.identity);
+                    extra.transform.rotation = Quaternion.FromToRotation(Vector3.down, -extra.transform.position);
+                    extra.transform.Rotate(0.0f, Random.Range(0, 360), 0.0f, Space.Self);
+                    extra.transform.SetParent(huts[j].transform);
+                }
+                if (ignores[j]) {
+                    int loc = Random.Range(0, 3);                    
+                    Vector3 extraPos = Vector3.zero;
+                    switch (loc) {
+                        case 0:
+                            extraPos = huts[j].transform.GetChild(2).transform.position;
+                            break;
+                        case 1:
+                            extraPos = huts[j].transform.GetChild(3).transform.position;
+                            break;
+                        case 2:
+                            extraPos = huts[j].transform.GetChild(4).transform.position;
+                            break;
+                        case 3:
+                            extraPos = huts[j].transform.GetChild(5).transform.position;
+                            break;
+                    }
+                    GameObject extra = Instantiate(fishRack1, extraPos * 0.995f, Quaternion.identity);
+                    extra.transform.rotation = Quaternion.FromToRotation(Vector3.down, -extra.transform.position);
+                    extra.transform.Rotate(0.0f, Random.Range(0, 360), 0.0f, Space.Self);
+                    extra.transform.SetParent(huts[j].transform);
                 }
             }
         }
@@ -336,8 +385,8 @@ public class PopulatWorld : MonoBehaviour {
 				for (int y = 0; y < gridSize; y++) 
 				{
                     // PINE TREES
-                    if (objectLocations[i].height[x, y] >= 101.0f &&
-                        objectLocations[i].height[x, y] <= 101.4f)
+                    if (objectLocations[i].height[x, y] >= 101.2f &&
+                        objectLocations[i].height[x, y] <= 101.8f)
                     {
                         if (pineTreeCountdown <= 0 &&
                             !Physics.Raycast(Vector3.zero, objectLocations[i].position[x, y], Mathf.Infinity))
@@ -370,7 +419,7 @@ public class PopulatWorld : MonoBehaviour {
                     }
 
                     // PALM TREES
-                    if (objectLocations[i].height[x, y] >= 100.4f &&
+                    if (objectLocations[i].height[x, y] >= 100.2f &&
                        objectLocations[i].height[x, y] <= 100.6f &&
                        objectLocations[i].position[x, y].y <= 70.0f &&
                        objectLocations[i].position[x, y].y >= -70.0f)
@@ -397,16 +446,15 @@ public class PopulatWorld : MonoBehaviour {
     {
         if (position.y <= 70.0f && position.y >= -70.0f)
         {
-            if (Random.Range(0.0f, 2.0f) >= 1.0f)
-            {
+            if (Random.Range(0.0f, 2.0f) >= 1.0f) {
                 GameObject obj = Instantiate(pineTree, position, Quaternion.identity);
                 obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
-                obj.transform.parent = pineTreeHolder.transform;
-            }
-            else
-            {
+                obj.transform.Rotate(0.0f, Random.Range(0, 360), 0.0f, Space.Self);
+                obj.transform.parent = pineTreeHolder.transform;               
+            } else {
                 GameObject obj = Instantiate(deadTree, position, Quaternion.identity);
                 obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
+                obj.transform.Rotate(0.0f, Random.Range(0, 360), 0.0f, Space.Self);
                 obj.transform.parent = pineTreeHolder.transform;
             }
         }
@@ -414,12 +462,14 @@ public class PopulatWorld : MonoBehaviour {
         {
             GameObject obj = Instantiate(pineTreeSnow, position, Quaternion.identity);
             obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
+            obj.transform.Rotate(0.0f, Random.Range(0, 360), 0.0f, Space.Self);
             obj.transform.parent = pineTreeHolder.transform;
         } 
         else 
         {
             GameObject obj = Instantiate(deadTreeSnow, position, Quaternion.identity);
             obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
+            obj.transform.Rotate(0.0f, Random.Range(0, 360), 0.0f, Space.Self);
             obj.transform.parent = pineTreeHolder.transform;
         }
     }
@@ -431,25 +481,29 @@ public class PopulatWorld : MonoBehaviour {
         {
             GameObject obj = Instantiate(forestTree1, position, Quaternion.identity);
             obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
+            obj.transform.Rotate(0.0f, Random.Range(0, 360), 0.0f, Space.Self);
             obj.transform.parent = forestTreeHolder.transform;
         }
         else if (picker <= 4.0f)
         {
             GameObject obj = Instantiate(forestTree2, position, Quaternion.identity);
             obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
+            obj.transform.Rotate(0.0f, Random.Range(0, 360), 0.0f, Space.Self);
             obj.transform.parent = forestTreeHolder.transform;
         }
         else if (picker <= 6.0f)
         {
             GameObject obj = Instantiate(berryTree, position, Quaternion.identity);
             obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
+            obj.transform.Rotate(0.0f, Random.Range(0, 360), 0.0f, Space.Self);
             obj.transform.parent = forestTreeHolder.transform;
         } 
         else 
         { 
             GameObject obj = Instantiate(bush, position, Quaternion.identity);
             obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
-            obj.transform.parent = forestTreeHolder.transform;
+            obj.transform.Rotate(0.0f, Random.Range(0, 360), 0.0f, Space.Self);
+            obj.transform.parent = forestTreeHolder.transform;            
         }
     }
 
@@ -459,12 +513,14 @@ public class PopulatWorld : MonoBehaviour {
         {
             GameObject obj = Instantiate(palmTree1, position, Quaternion.identity);
             obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
+            obj.transform.Rotate(0.0f, Random.Range(0, 360), 0.0f, Space.Self);
             obj.transform.parent = palmTreeHolder.transform;
         }
         else
         {
             GameObject obj = Instantiate(palmTree2, position, Quaternion.identity);
             obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
+            obj.transform.Rotate(0.0f, Random.Range(0, 360), 0.0f, Space.Self);
             obj.transform.parent = palmTreeHolder.transform;
         }
     }
