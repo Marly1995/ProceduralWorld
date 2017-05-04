@@ -160,7 +160,7 @@ public class PopulatWorld : MonoBehaviour {
             huts.Add(Instantiate(beachhutLarge, tikiLocations[i].obj.transform.position * 1.005f, Quaternion.identity));
             huts[huts.Count - 1].transform.SetParent(tikiLocations[i].obj.transform);
             int nextHut = (int)Random.Range(20.0f, 40.0f);
-            int nextDock = (int)Random.Range(2.0f, 5.0f);
+            //int nextDock = (int)Random.Range(2.0f, 5.0f);
             tikiLocations[i].items.Add(huts[huts.Count - 1]);
             int searchRange = gridSize / 2;
             for (int x = tikiLocations[i].x - gridSize; x < gridSize; x++)
@@ -183,17 +183,17 @@ public class PopulatWorld : MonoBehaviour {
                                 }
                             }
                         }
-                        if (objectLocations[tikiLocations[i].chunk].height[x, y] >= 100.021f &&
-                            objectLocations[tikiLocations[i].chunk].height[x, y] <= 100.023f) {
-                            if (nextDock <= 0) {
-                                GameObject obj = Instantiate(pier, objectLocations[tikiLocations[i].chunk].position[x, y] * 1.005f, Quaternion.identity);
-                                obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -obj.transform.position);
-                                obj.transform.Rotate(0.0f, Random.Range(-40, 40), 0.0f, Space.Self);
-                                obj.transform.SetParent(tikiLocations[i].obj.transform);
-                                nextDock = (int)Random.Range(2.0f, 5.0f);
-                            }
-                            nextDock--;
-                        }
+                        //if (objectLocations[tikiLocations[i].chunk].height[x, y] >= 100.021f &&
+                        //    objectLocations[tikiLocations[i].chunk].height[x, y] <= 100.023f) {
+                        //    if (nextDock <= 0) {
+                        //        GameObject obj = Instantiate(pier, objectLocations[tikiLocations[i].chunk].position[x, y] * 1.005f, Quaternion.identity);
+                        //        obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -obj.transform.position);
+                        //        obj.transform.Rotate(0.0f, Random.Range(-40, 40), 0.0f, Space.Self);
+                        //        obj.transform.SetParent(tikiLocations[i].obj.transform);
+                        //        nextDock = (int)Random.Range(2.0f, 5.0f);
+                        //    }
+                        //    nextDock--;
+                        //}
                     }
                 }
             }
@@ -264,21 +264,25 @@ public class PopulatWorld : MonoBehaviour {
                 if (ignores[j]) {
                     int loc = Random.Range(0, 3);                    
                     Vector3 extraPos = Vector3.zero;
+                    GameObject rack = fishRack1;
                     switch (loc) {
                         case 0:
                             extraPos = huts[j].transform.GetChild(2).transform.position;
+                            rack = fishRack3;
                             break;
                         case 1:
                             extraPos = huts[j].transform.GetChild(3).transform.position;
+                            rack = fishRack2;
                             break;
                         case 2:
                             extraPos = huts[j].transform.GetChild(4).transform.position;
+                            rack = fishRack1;
                             break;
                         case 3:
                             extraPos = huts[j].transform.GetChild(5).transform.position;
                             break;
                     }
-                    GameObject extra = Instantiate(fishRack1, extraPos * 0.995f, Quaternion.identity);
+                    GameObject extra = Instantiate(rack, extraPos * 0.995f, Quaternion.identity);
                     extra.transform.rotation = Quaternion.FromToRotation(Vector3.down, -extra.transform.position);
                     extra.transform.Rotate(0.0f, Random.Range(0, 360), 0.0f, Space.Self);
                     extra.transform.SetParent(huts[j].transform);
@@ -307,17 +311,59 @@ public class PopulatWorld : MonoBehaviour {
                         {
                             if (!Physics.Raycast(Vector3.zero, objectLocations[igluLocations[i].chunk].position[x, y], Mathf.Infinity))
                             {
-                                if (Vector3.Distance(objectLocations[igluLocations[i].chunk].position[x, y] * 0.999f, iglus[0].transform.position) <= 10.0f)
-                                {
-                                    iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk].position[x, y] * 0.999f, Quaternion.identity));
-                                    iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);                                   
-                                    iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position, iglus[iglus.Count - 1].transform.position);                                   
+                                if (Vector3.Distance(objectLocations[igluLocations[i].chunk].position[x, y] * 0.999f, iglus[0].transform.position) <= 10.0f) {
+                                    if (Random.Range(0.0f, 4.0f) <= 3.0f) {
+                                        iglus.Add(Instantiate(smallIglu, objectLocations[igluLocations[i].chunk].position[x, y] * 0.999f, Quaternion.identity));
+                                        iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
+                                        iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position, iglus[iglus.Count - 1].transform.position);
+                                    } else {
+                                        iglus.Add(Instantiate(fireIglu, objectLocations[igluLocations[i].chunk].position[x, y] * 0.999f, Quaternion.identity));
+                                        iglus[iglus.Count - 1].transform.SetParent(igluLocations[i].obj.transform);
+                                        iglus[iglus.Count - 1].transform.LookAt(iglus[0].transform.position, iglus[iglus.Count - 1].transform.position);
+                                    }
                                 }
                             }                            
                         }
                     }
                 }                
-            }           
+            }
+            if (iglus.Count <= 6) {
+                GameObject obj = smallFire;
+                obj.transform.rotation = iglus[0].transform.rotation;
+                obj.transform.position = iglus[0].transform.position;                
+                DestroyImmediate(iglus[0]);
+                obj = Instantiate(obj);
+                obj.transform.SetParent(igluLocations[i].obj.transform);
+            } else {
+                GameObject obj = largeFire;
+                obj.transform.rotation = iglus[0].transform.rotation;
+                obj.transform.position = iglus[0].transform.position;
+                DestroyImmediate(iglus[0]);
+                obj = Instantiate(obj);
+                obj.transform.SetParent(igluLocations[i].obj.transform);
+            }
+            for (int k = 1; k < iglus.Count; k++) {
+                int loc = Random.Range(0, 3);
+                Vector3 extraPos = Vector3.zero;
+                switch (loc) {
+                    case 0:
+                        extraPos = iglus[k].transform.GetChild(2).transform.position;
+                        break;
+                    case 1:
+                        extraPos = iglus[k].transform.GetChild(3).transform.position;
+                        break;
+                    case 2:
+                        extraPos = iglus[k].transform.GetChild(4).transform.position;
+                        break;
+                    case 3:
+                        extraPos = iglus[k].transform.GetChild(5).transform.position;
+                        break;
+                }
+                GameObject extra = Instantiate(fishRackSnow, extraPos * 0.995f, Quaternion.identity);
+                extra.transform.rotation = Quaternion.FromToRotation(Vector3.down, -extra.transform.position);
+                extra.transform.Rotate(0.0f, Random.Range(0, 360), 0.0f, Space.Self);
+                extra.transform.SetParent(iglus[k].transform);
+            }      
         }
     }
 
