@@ -20,8 +20,7 @@ public class sphereMapping : MonoBehaviour {
         for (int i = 0; i < segments.Length; i++)
         {
             Mesh temp = new Mesh();
-			temp.vertices = segments[i].mesh.vertices;
-			Vector3[] sphereNormals = segments[i].mesh.normals;			
+			temp.vertices = segments[i].mesh.vertices;			
 			temp = GenerateTris(gridSize, segments[i].mesh.vertices, divs);
 			temp.uv = segments[i].mesh.uv;
             if (useFlatShading)
@@ -124,7 +123,6 @@ public class sphereMapping : MonoBehaviour {
     {
         Mesh mesh = new Mesh();
         Vector3[] vertices = new Vector3[(gridSize+1)*(gridSize+1)];
-        Vector3[] normals = new Vector3[vertices.Length];
 		Vector2[] uvs = new Vector2[vertices.Length];
 		int i = 0;
         for (int y = 0; y <= gridSize; y++)
@@ -132,7 +130,7 @@ public class sphereMapping : MonoBehaviour {
             for (int x = 0; x <= gridSize; x++)
             {
 				uvs[i] = new Vector2(x / (float)gridSize, y / (float)gridSize);
-				SetVertex(inc, gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x + xStart, y + yStart, z, y + yStart, x + xStart);				
+				SetVertex(inc, gridSize, radius, heightMap, heightMultiplier, _heightCurve, vertices, i++, x + xStart, y + yStart, z, y + yStart, x + xStart);				
 			}
         }
         Color[] colorMap = new Color[gridSize * gridSize];
@@ -152,7 +150,6 @@ public class sphereMapping : MonoBehaviour {
             }
         }
         mesh.vertices = vertices;
-        mesh.normals = normals;
 		mesh.uv = uvs;		
 		SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize), colorMap, heightMap);
         return segment;
@@ -162,7 +159,6 @@ public class sphereMapping : MonoBehaviour {
     {
         Mesh mesh = new Mesh();
         Vector3[] vertices = new Vector3[(gridSize + 1) * (gridSize + 1)];
-        Vector3[] normals = new Vector3[vertices.Length];
 		Vector2[] uvs = new Vector2[vertices.Length];
 		int i = 0;
         for (int z = 0; z <= gridSize; z++)
@@ -170,7 +166,7 @@ public class sphereMapping : MonoBehaviour {
             for (int x = 0; x <= gridSize; x++)
             {
 				uvs[i] = new Vector2(x / (float)gridSize, z / (float)gridSize);
-				SetVertex(inc, gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x + xStart, y, z + zStart, z + zStart, x + xStart);
+				SetVertex(inc, gridSize, radius, heightMap, heightMultiplier, _heightCurve, vertices, i++, x + xStart, y, z + zStart, z + zStart, x + xStart);
             }
         }
         Color[] colorMap = new Color[gridSize * gridSize];
@@ -192,7 +188,6 @@ public class sphereMapping : MonoBehaviour {
             }
         }
         mesh.vertices = vertices;
-        mesh.normals = normals;
 		mesh.uv = uvs;
 		SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize), colorMap, heightMap);
         return segment;
@@ -202,7 +197,6 @@ public class sphereMapping : MonoBehaviour {
     {
         Mesh mesh = new Mesh();
         Vector3[] vertices = new Vector3[(gridSize + 1) * (gridSize + 1)];
-        Vector3[] normals = new Vector3[vertices.Length];
 		Vector2[] uvs = new Vector2[vertices.Length];
 		int i = 0;
         for (int z = 0; z <= gridSize; z++)
@@ -210,7 +204,7 @@ public class sphereMapping : MonoBehaviour {
             for (int y = 0; y <= gridSize; y++)
             {
 				uvs[i] = new Vector2(y / (float)gridSize, z / (float)gridSize);
-				SetVertex(inc, gridSize, radius, heightMap, heightMultiplier, _heightCurve, normals, vertices, i++, x, y + yStart, z + zStart, z + zStart, y + yStart);
+				SetVertex(inc, gridSize, radius, heightMap, heightMultiplier, _heightCurve, vertices, i++, x, y + yStart, z + zStart, z + zStart, y + yStart);
             }
         }
         Color[] colorMap = new Color[gridSize * gridSize];
@@ -232,13 +226,12 @@ public class sphereMapping : MonoBehaviour {
             }
         }
         mesh.vertices = vertices;
-        mesh.normals = normals;
 		mesh.uv = uvs;
 		SegmentData segment = new SegmentData(mesh, TextureGenerator.TextureFromColorMap(colorMap, gridSize, gridSize), colorMap, heightMap);
         return segment;
     }
 
-    private static void SetVertex(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, Vector3[] normals, Vector3[] vertices, int i, int x, int y, int z, int xy, int xz)
+    private static void SetVertex(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, Vector3[] vertices, int i, int x, int y, int z, int xy, int xz)
     {       
         Vector3 v = new Vector3(x, y, z) * 2.0f / (gridSize*inc) - Vector3.one;
         float x2 = v.x * v.x;
@@ -248,8 +241,8 @@ public class sphereMapping : MonoBehaviour {
         s.x = v.x * Mathf.Sqrt(1f - y2 / 2f - z2 / 2f + y2 * z2 / 3f);
         s.y = v.y * Mathf.Sqrt(1f - x2 / 2f - z2 / 2f + x2 * z2 / 3f);
         s.z = v.z * Mathf.Sqrt(1f - x2 / 2f - y2 / 2f + x2 * y2 / 3f);
-		normals[i] = s.normalized;       
-        vertices[i] = normals[i] * (radius + _heightCurve.Evaluate(heightMap[xz, xy]) * heightMultiplier);
+		vertices[i] = s.normalized;       
+        vertices[i] *= (radius + _heightCurve.Evaluate(heightMap[xz, xy]) * heightMultiplier);
     }
 
     private static Mesh GenerateTris(int gridSize, Vector3[] vertices, int divs)
@@ -347,7 +340,6 @@ public class sphereMapping : MonoBehaviour {
         temp.vertices = flatVerts;
         temp.uv = flatUVs;
         temp.triangles = triangles;
-        temp.RecalculateNormals();
         return temp;
     }
 }
