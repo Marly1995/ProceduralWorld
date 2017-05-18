@@ -16,7 +16,7 @@ public class IslandGenerator : MonoBehaviour {
 
 	[Range(0,2)]
 	public int divisions;
-	[Range(10,250)]
+	[Range(4,50)]
 	public int gridSize;
 	
     public float noiseScale;
@@ -46,7 +46,7 @@ public class IslandGenerator : MonoBehaviour {
 
     [Range(0, 1)]
 	public float falloffHeight;
-	[Range(10, 500)]
+	[Range(4, 50)]
 	public int halfIslandSize;
 
 	public bool autoUpdate;
