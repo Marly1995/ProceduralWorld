@@ -92,8 +92,6 @@ public static class NoiseGeneration
     {
         RiggedMultifractal rmf = new RiggedMultifractal();
 
-        Voronoi vor = new Voronoi();
-
         Perlin perlin = new Perlin(scale, lacunarity, persistance, sheets, seed, QualityMode.High);
 
         Const constGen = new Const(0.5f);
