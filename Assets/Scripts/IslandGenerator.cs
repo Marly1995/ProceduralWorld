@@ -52,6 +52,9 @@ public class IslandGenerator : MonoBehaviour {
 	public bool autoUpdate;
     public bool flat_shading;
 
+    public bool randomColors;
+    public bool randomize;
+
     public TerrainType[] regions;
 	float[,] falloffMap;
 
@@ -60,6 +63,7 @@ public class IslandGenerator : MonoBehaviour {
 
     private void Start()
     {
+        
         startTime = Time.deltaTime;
         int i = ((int)Math.Pow(4, divisions));
         i = (int)Mathf.Pow(i, 0.5f);
@@ -93,8 +97,16 @@ public class IslandGenerator : MonoBehaviour {
         //Debug.Log(endTime);
     }
     public void DrawMapInEditor()
-    {		
-		MapData[] mapData = new MapData[6];
+    {
+        if (randomColors)
+        {
+            RandomizeColors();
+        }
+        if (randomize)
+        {
+            seed = UnityEngine.Random.Range(-10000, 10000);
+        }
+        MapData[] mapData = new MapData[6];
         int i = ((int)Mathf.Pow(4, divisions));
         for (int j = 0; j < 6; j++)
         {
@@ -184,6 +196,15 @@ public class IslandGenerator : MonoBehaviour {
         
         return new global::MapData(noiseMap, colorMap);
 	}
+
+    public void RandomizeColors()
+    {
+        for (int i = 0; i < regions.Length; i++)
+        {
+            regions[i].color = UnityEngine.Random.ColorHSV();
+            regions[i].iceColor = regions[i].color;
+        }
+    }
 
     void OnValidate()
     {

@@ -22,5 +22,10 @@ public class IslandGenerationEditor : Editor
         {
             islandGen.DrawMapInEditor();
         }
+
+        if (GUILayout.Button ("Random Colors"))
+        {
+            islandGen.RandomizeColors();
+        }
     }
 }
