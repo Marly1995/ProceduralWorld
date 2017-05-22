@@ -199,9 +199,15 @@ public class IslandGenerator : MonoBehaviour {
 
     public void RandomizeColors()
     {
+        Color col = UnityEngine.Random.ColorHSV(0.3f, 0.8f, 0.3f, 0.8f, 1.0f, 1.0f);
+        col.a = 0.5f;
         for (int i = 0; i < regions.Length; i++)
         {
-            regions[i].color = UnityEngine.Random.ColorHSV();
+            col.r += UnityEngine.Random.Range(0.2f, 0.4f)-0.4f;
+            col.g += UnityEngine.Random.Range(0.2f, 0.4f)-0.4f;
+            col.b += UnityEngine.Random.Range(0.2f, 0.4f)-0.4f;
+            col.a += 0.1f;
+            regions[i].color = col;
             regions[i].iceColor = regions[i].color;
         }
     }

@@ -27,7 +27,7 @@ public class MapDisplay : MonoBehaviour {
         for (int i = 0; i < segments.Length; i++)
         {
             meshFilter[i].sharedMesh = segments[i].mesh;
-            //meshRenderer[i].sharedMaterial = new Material(Shader.Find("Standard"));
+            meshRenderer[i].sharedMaterial = new Material(Shader.Find("Diffuse With Shadows"));
             meshRenderer[i].sharedMaterial.mainTexture = segments[i].texture;
         }
 		//PopulatWorld world = FindObjectOfType<PopulatWorld> ();
