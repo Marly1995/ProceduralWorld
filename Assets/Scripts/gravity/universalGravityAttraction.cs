@@ -11,6 +11,5 @@ public class universalGravityAttraction : MonoBehaviour {
 
         body.rotation = Quaternion.FromToRotation(bodyUp, targetDir) * body.rotation;
         body.GetComponent<Rigidbody>().AddForce(targetDir * gravity);
-
     }
 }
