@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class IslandGenerator : MonoBehaviour {
 
+    //public Material sea;
     public enum DrawMode { NoiseMap, ColorMap, Mesh, Sphere };
     public DrawMode drawMode;
 
@@ -58,8 +59,7 @@ public class IslandGenerator : MonoBehaviour {
     public TerrainType[] regions;
 	float[,] falloffMap;
 
-    Queue<MapThreadInfo<MapData>> mapDataThreadQueue = new Queue<MapThreadInfo<MapData>>();
-    Queue<MapThreadInfo<MeshData>> meshDataThreadQueue = new Queue<MapThreadInfo<MeshData>>();
+    public ColorManager colMan;
 
     private void Start()
     {
@@ -87,14 +87,6 @@ public class IslandGenerator : MonoBehaviour {
 
     private void Update()
     {
-        startTime = Time.deltaTime;
-        if (Input.GetKeyDown("a"))
-        {
-            Debug.Log("Started");
-            DrawMapInEditor();
-        }
-        endTime = Time.deltaTime;
-        //Debug.Log(endTime);
     }
     public void DrawMapInEditor()
     {
@@ -199,17 +191,21 @@ public class IslandGenerator : MonoBehaviour {
 
     public void RandomizeColors()
     {
-        Color col = UnityEngine.Random.ColorHSV(0.3f, 0.8f, 0.3f, 0.8f, 1.0f, 1.0f);
-        col.a = 0.5f;
+        int coln = UnityEngine.Random.Range(0, 6);
+        Color col = colMan.colors[coln];
+        col.a = 1.0f;
         for (int i = 0; i < regions.Length; i++)
         {
             col.r += UnityEngine.Random.Range(0.2f, 0.4f)-0.4f;
             col.g += UnityEngine.Random.Range(0.2f, 0.4f)-0.4f;
             col.b += UnityEngine.Random.Range(0.2f, 0.4f)-0.4f;
-            col.a += 0.1f;
+            col.a -= 0.1f;
             regions[i].color = col;
             regions[i].iceColor = regions[i].color;
         }
+        Color tcol = colMan.compliments[coln];
+        tcol.a = 0.3f;
+        //sea.color = tcol;
     }
 
     void OnValidate()

@@ -7,6 +7,7 @@ public class MapDisplay : MonoBehaviour {
     public Renderer textureRenderer;
     public MeshFilter[] meshFilter = new MeshFilter[6];
     public MeshRenderer[] meshRenderer = new MeshRenderer[6];
+    public MeshCollider[] meshCollider = new MeshCollider[6];
 
     public Terrain terrain;
 
@@ -29,6 +30,11 @@ public class MapDisplay : MonoBehaviour {
             meshFilter[i].sharedMesh = segments[i].mesh;
             meshRenderer[i].sharedMaterial = new Material(Shader.Find("Diffuse With Shadows"));
             meshRenderer[i].sharedMaterial.mainTexture = segments[i].texture;
+            meshCollider[i].sharedMesh = segments[i].mesh;
+
+            //seaMeshFilter[i].sharedMesh = segments[i].mesh;
+            //seaMeshRenderer[i].sharedMaterial = new Material(Shader.Find("FX/Water"));
+            //seaMeshRenderer[i].sharedMaterial.mainTexture = segments[i].texture;
         }
 		//PopulatWorld world = FindObjectOfType<PopulatWorld> ();
 		//world.Populate (segments);
