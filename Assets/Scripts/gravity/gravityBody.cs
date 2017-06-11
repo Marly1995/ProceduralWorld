@@ -6,6 +6,7 @@ using UnityEngine;
 public class gravityBody : MonoBehaviour {
 
     universalGravityAttraction planet;
+    public float gravity = -6f;
 
     private void Awake()
     {
@@ -16,6 +17,6 @@ public class gravityBody : MonoBehaviour {
 
     private void FixedUpdate()
     {
-        planet.Attract(transform);
+        planet.Attract(transform, gravity);
     }
 }

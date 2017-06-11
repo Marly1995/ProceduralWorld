@@ -4,9 +4,7 @@ using UnityEngine;
 
 public class universalGravityAttraction : MonoBehaviour {
 
-    public float gravity = -6f;
-
-    public void Attract(Transform body)
+    public void Attract(Transform body, float gravity)
     {
         Vector3 targetDir = (body.position - transform.position).normalized;
         Vector3 bodyUp = body.up;
