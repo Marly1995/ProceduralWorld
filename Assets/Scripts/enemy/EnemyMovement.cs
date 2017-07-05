@@ -6,6 +6,7 @@ public class EnemyMovement : MonoBehaviour {
 
     Transform player;
     public float speed = 2;
+    public float health = 4;
 
 	// Use this for initialization
 	void Start ()
@@ -17,6 +18,10 @@ public class EnemyMovement : MonoBehaviour {
 	void Update ()
     {
         transform.rotation = Quaternion.LookRotation(player.position - transform.position, transform.up);
+        if (health <= 0)
+        {
+            Destroy(transform.gameObject);
+        }
     }
 
     private void FixedUpdate()

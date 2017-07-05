@@ -5,10 +5,14 @@ using UnityEngine;
 public class BulletScript : MonoBehaviour {
 
     public float life = 6;
+    public float damage = 1;
+    public gravityBody gb;
+    public Rigidbody rb;
 
 	// Use this for initialization
 	void Start () {
         Destroy(this.gameObject, life);
+        gb.gravity = -1.5f * rb.velocity.magnitude;
 	}
 	
 	// Update is called once per frame
@@ -18,6 +22,13 @@ public class BulletScript : MonoBehaviour {
 
     private void OnCollisionEnter(Collision collision)
     {
-        Destroy(this.gameObject);
+        if (collision.gameObject.tag != "bullet")
+        {
+            Destroy(this.gameObject);
+        }
+        if (collision.gameObject.tag == "enemy")
+        {
+            collision.gameObject.GetComponent<EnemyMovement>().health -= damage;
+        }
     }
 }

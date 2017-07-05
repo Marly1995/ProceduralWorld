@@ -10,6 +10,7 @@ public class InputManager : MonoBehaviour {
 
     public IslandGenerator gen;
     public GameObject player;
+    public GameObject enemy;
 
 	// Use this for initialization
 	void Start () {
@@ -32,6 +33,7 @@ public class InputManager : MonoBehaviour {
         gen.DrawMapInEditor();
         gen.randomize = false;
         SetPlayerLocation();
+        PopulateEnemys();
     }
 
     void GenerateRandomColors()
@@ -44,5 +46,10 @@ public class InputManager : MonoBehaviour {
     void SetPlayerLocation()
     {
         player.transform.position = new Vector3(6, 8, 0);
+    }
+
+    void PopulateEnemys()
+    {
+
     }
 }
