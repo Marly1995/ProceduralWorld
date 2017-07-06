@@ -1,0 +1,17 @@
+# Made using Asset Forge (www.assetforge.io) version 1.0 
+
+newmtl black (Instance)
+Ka 0.000000 0.000000 0.000000 
+Kd 0.2666667 0.2666667 0.2666667 
+Ks 0.330000 0.330000 0.330000 
+
+newmtl black (Instance) (Instance)
+Ka 0.000000 0.000000 0.000000 
+Kd 0.2666667 0.2666667 0.2666667 
+Ks 0.330000 0.330000 0.330000 
+
+newmtl _defaultMat (Instance) (Instance)
+Ka 0.000000 0.000000 0.000000 
+Kd 0.7177088 0.707427 0.707427 
+Ks 0.330000 0.330000 0.330000 
+

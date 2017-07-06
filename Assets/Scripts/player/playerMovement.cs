@@ -4,24 +4,36 @@ using UnityEngine;
 
 public class playerMovement : MonoBehaviour {
 
-    public float speed;
+    public float acceleration;
+    public float decelaration;
+    public float maxSpeed;
+    float currentSpeed;
     Vector3 moveAmount;
     Vector3 smoothMoveVelocity;
+    Rigidbody rb;
         
 	// Use this for initialization
 	void Start () {
-		
+        rb = GetComponent<Rigidbody>();	
 	}
 	
 	// Update is called once per frame
 	void Update () {
         Vector3 moveDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
-        Vector3 targetMoveAmount = moveDir * speed;
+        if (moveDir.magnitude >= 0.2)
+        {
+            currentSpeed = currentSpeed >= maxSpeed ? currentSpeed : currentSpeed + acceleration;
+        }
+        else
+        {
+            currentSpeed = currentSpeed <= 0 ? currentSpeed : 0 - decelaration;
+        }
+        Vector3 targetMoveAmount = moveDir * currentSpeed;
         moveAmount = Vector3.SmoothDamp(moveAmount, targetMoveAmount, ref smoothMoveVelocity, 0.15f);
     }
 
     private void FixedUpdate()
     {
-        GetComponent<Rigidbody>().MovePosition(GetComponent<Rigidbody>().position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime);
+        rb.MovePosition(GetComponent<Rigidbody>().position + transform.TransformDirection(moveAmount) * Time.fixedDeltaTime);
     }
 }
