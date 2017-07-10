@@ -13,7 +13,7 @@ public class playerRotation : MonoBehaviour {
         Vector3 newDir = transform.parent.transform.right * Input.GetAxisRaw("Horizontal") + transform.parent.transform.forward * Input.GetAxisRaw("Vertical");
         if (newDir != Vector3.zero)
         {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(newDir, transform.up), 0.1f);
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(newDir, transform.up), 0.075f);
         }
     }
 }
