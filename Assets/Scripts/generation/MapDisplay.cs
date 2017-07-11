@@ -7,6 +7,8 @@ public class MapDisplay : MonoBehaviour {
     public Renderer textureRenderer;
     public MeshFilter[] meshFilter = new MeshFilter[6];
     public MeshRenderer[] meshRenderer = new MeshRenderer[6];
+
+    public MeshFilter[] colliderMesh = new MeshFilter[6];
     public MeshCollider[] meshCollider = new MeshCollider[6];
 
     public Terrain terrain;
@@ -30,7 +32,9 @@ public class MapDisplay : MonoBehaviour {
             meshFilter[i].sharedMesh = segments[i].mesh;
             meshRenderer[i].sharedMaterial = new Material(Shader.Find("Diffuse With Shadows"));
             meshRenderer[i].sharedMaterial.mainTexture = segments[i].texture;
-            meshCollider[i].sharedMesh = segments[i].mesh;
+            
+            colliderMesh[i].sharedMesh = segments[i].collider;
+            meshCollider[i].sharedMesh = segments[i].collider;
 
             //seaMeshFilter[i].sharedMesh = segments[i].mesh;
             //seaMeshRenderer[i].sharedMaterial = new Material(Shader.Find("FX/Water"));

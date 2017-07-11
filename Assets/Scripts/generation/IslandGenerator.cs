@@ -271,14 +271,16 @@ public struct MapData
 public struct SegmentData
 {
     public Mesh mesh;
+    public Mesh collider;
     public Texture2D texture;
 	public MapData MapData;
 
 
-	public SegmentData(Mesh mesh, Texture2D texture, Color[] colorMap, float[,] heightMap)
+	public SegmentData(Mesh mesh, Mesh collider, Texture2D texture, Color[] colorMap, float[,] heightMap)
     {
         this.mesh = mesh;
         this.texture = texture;
 		this.MapData = new MapData(heightMap, colorMap);
+        this.collider = collider;
     }
 }
