@@ -17,7 +17,7 @@ public class IslandGenerator : MonoBehaviour {
 
 	[Range(0,2)]
 	public int divisions;
-	[Range(4,50)]
+	[Range(4,250)]
 	public int gridSize;
 	
     public float noiseScale;
@@ -47,7 +47,7 @@ public class IslandGenerator : MonoBehaviour {
 
     [Range(0, 1)]
 	public float falloffHeight;
-	[Range(4, 50)]
+	[Range(4, 250)]
 	public int halfIslandSize;
 
 	public bool autoUpdate;
@@ -206,6 +206,12 @@ public class IslandGenerator : MonoBehaviour {
         Color tcol = colMan.compliments[coln];
         tcol.a = 0.3f;
         //sea.color = tcol;
+    }
+
+    public void RandomizeHeights()
+    {
+        float half = meshHeightmultiplier / 2;
+        meshHeightmultiplier = UnityEngine.Random.Range(meshHeightmultiplier-half, meshHeightmultiplier+half);
     }
 
     void OnValidate()

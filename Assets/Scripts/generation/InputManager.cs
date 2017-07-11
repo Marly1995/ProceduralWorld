@@ -8,44 +8,45 @@ public class InputManager : MonoBehaviour {
     public Button random;
     public Button randomColor;
 
-    public IslandGenerator gen;
+    public IslandGenerator[] generators;
     public GameObject player;
     public GameObject enemy;
 
 	// Use this for initialization
 	void Start () {
-        random.onClick.AddListener(GenerateRandom);
-        randomColor.onClick.AddListener(GenerateRandomColors);
-        GenerateRandom();
+        GenerateRandom(0);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetKey("a")) {
-            GenerateRandom();
+		if (Input.GetKey("a"))
+        {
+            int index = Random.Range(0, generators.Length - 1);
+            GenerateRandom(index);
         }
 	}
 
-    void GenerateRandom()
+    void GenerateRandom(int i)
     {
-        gen.RandomizeColors();
-        gen.randomize = true;
-        gen.DrawMapInEditor();
-        gen.randomize = false;
+        generators[i].RandomizeColors();
+        generators[i].RandomizeHeights();
+        generators[i].randomize = true;
+        generators[i].DrawMapInEditor();
+        generators[i].randomize = false;
         SetPlayerLocation();
         PopulateEnemys();
     }
 
-    void GenerateRandomColors()
+    void GenerateRandomColors(int i)
     {
-        gen.randomize = false;
-        gen.RandomizeColors();
-        gen.DrawMapInEditor();
+        generators[i].randomize = false;
+        generators[i].RandomizeColors();
+        generators[i].DrawMapInEditor();
     }
 
     void SetPlayerLocation()
     {
-        player.transform.position = new Vector3(6, 8, 0);
+        player.transform.position = new Vector3(6, 30, 0);
     }
 
     void PopulateEnemys()

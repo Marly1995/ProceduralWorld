@@ -8,7 +8,7 @@ public class sphereMapping : MonoBehaviour {
 
     public static SegmentData[] getSphere(int divs, int gridSize, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve, TerrainType[] regions, bool useFlatShading)
     {
-    float radius = 5.0f;
+    float radius = 10.0f;
 
     return Generate(divs, gridSize, radius, heightMap, heightMultiplier, _heightCurve, regions, useFlatShading);
     }
@@ -229,7 +229,7 @@ public class sphereMapping : MonoBehaviour {
         s.y = v.y * Mathf.Sqrt(1f - x2 / 2f - z2 / 2f + x2 * z2 / 3f);
         s.z = v.z * Mathf.Sqrt(1f - x2 / 2f - y2 / 2f + x2 * y2 / 3f);
 		vertices[i] = s.normalized;       
-        vertices[i] *= (radius + _heightCurve.Evaluate(heightMap[xz, xy]) * heightMultiplier);
+        vertices[i] *= Mathf.Round((radius + _heightCurve.Evaluate(heightMap[xz, xy]) * heightMultiplier)*1000)/1000;
     }
 
     private static Mesh GenerateTris(int gridSize, Vector3[] vertices, int divs)
