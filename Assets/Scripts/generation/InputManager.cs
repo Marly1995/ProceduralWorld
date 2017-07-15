@@ -46,7 +46,7 @@ public class InputManager : MonoBehaviour {
 
     void SetPlayerLocation()
     {
-        player.transform.position = new Vector3(6, 30, 0);
+        player.transform.position = new Vector3(6, 50, 0);
     }
 
     void PopulateEnemys()

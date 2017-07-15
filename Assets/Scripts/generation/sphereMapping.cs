@@ -30,7 +30,7 @@ public class sphereMapping : MonoBehaviour {
             segments[i].mesh = temp;
             Mesh col = new Mesh();
             col.vertices = segments[i].collider.vertices;
-            col = GenerateTris(gridSize/10, segments[i].collider.vertices, divs);
+            col = GenerateTris(gridSize / 10, segments[i].collider.vertices, divs);
             segments[i].collider = col;
 
             if (i >= divs * 1 && i < divs * 3)
@@ -175,7 +175,7 @@ public class sphereMapping : MonoBehaviour {
             }
         }
         Mesh col = new Mesh();
-        int colGridSize = gridSize / 10;
+        int colGridSize = gridSize/10;
         Vector3[] verts = new Vector3[(colGridSize + 1) * (colGridSize + 1)];
         i = 0;
         for (int z = 0; z <= gridSize; z+= colGridSize)

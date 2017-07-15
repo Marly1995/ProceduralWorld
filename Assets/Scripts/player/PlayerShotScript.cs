@@ -32,7 +32,7 @@ public class PlayerShotScript : MonoBehaviour {
                 {
                     GameObject obj = Instantiate(bullet, bulletSpawnLocation.position, transform.rotation);
                     obj.transform.Rotate(transform.parent.transform.parent.transform.up, Random.Range(-gun.accuracy, gun.accuracy), Space.World);
-                    obj.GetComponent<Rigidbody>().velocity = (-obj.transform.forward * Random.Range(gun.shotSpeed - 2, gun.shotSpeed + 2));
+                    obj.GetComponent<Rigidbody>().velocity = 2 * (-obj.transform.forward * Random.Range(gun.shotSpeed - 2, gun.shotSpeed + 2));
                 }
             }
         }
