@@ -12,6 +12,7 @@ public class MapDisplay : MonoBehaviour {
     public MeshCollider[] meshCollider = new MeshCollider[6];
 
     public Terrain terrain;
+    public PopulatWorld world;
 
     public void DrawTexture(Texture2D texture)
     {
@@ -40,8 +41,7 @@ public class MapDisplay : MonoBehaviour {
             //seaMeshRenderer[i].sharedMaterial = new Material(Shader.Find("FX/Water"));
             //seaMeshRenderer[i].sharedMaterial.mainTexture = segments[i].texture;
         }
-		//PopulatWorld world = FindObjectOfType<PopulatWorld> ();
-		//world.Populate (segments);
+		world.Populate(segments);
 	}
 
     public void DrawTerrain(TerrainData terrainData)
