@@ -23,6 +23,7 @@ public class PopulatWorld : MonoBehaviour {
     public void Populate (SegmentData[] segments) {
 		worldData = segments;
         objectLocations = new ObjectLocations[segments.Length];
+        gridSize = gridSize / 6;
 
         PopulateWorld();
 
@@ -35,9 +36,9 @@ public class PopulatWorld : MonoBehaviour {
         {
             int index = 0;
             objectLocations[i] = new ObjectLocations(gridSize);
-            for (int x = 0; x < gridSize; x+=6)
+            for (int x = 0; x < gridSize; x++)
             {
-                for (int y = 0; y < gridSize; y+=6)
+                for (int y = 0; y < gridSize; y++)
                 {
                     Vector3 position = worldData[i].mesh.vertices[worldData[i].mesh.triangles[index * 36]];
                     float height = position.magnitude;
@@ -56,9 +57,9 @@ public class PopulatWorld : MonoBehaviour {
         {
 			int rockCount = 0;
 
-            for (int x = 0; x < gridSize; x+=6) 
+            for (int x = 0; x < gridSize; x++) 
 			{
-				for (int y = 0; y < gridSize; y+=6) 
+				for (int y = 0; y < gridSize; y++) 
 				{
                     // PINE TREES
                     if (objectLocations[i].height[x, y] >= 10.001f &&
@@ -77,10 +78,11 @@ public class PopulatWorld : MonoBehaviour {
 		}
 	}
 
+    int rockIndex;
     void SpawnRock(Vector3 position)
     {
-        int index = Random.Range(0, 3);
-        switch(index)
+        rockIndex = Random.Range(0, 3);
+        switch(rockIndex)
         {
             case 0:
                 PlaceObject(rock1, position, rockHolder);
@@ -99,10 +101,11 @@ public class PopulatWorld : MonoBehaviour {
 
     void PlaceObject(GameObject temp, Vector3 position, GameObject parent)
     {
-        GameObject obj = Instantiate(temp, position, Quaternion.identity);
-        obj.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
-        obj.transform.Rotate(0.0f, Random.Range(0, 360), 0.0f, Space.Self);
-        obj.transform.parent = parent.transform;
+        temp.transform.position = position;
+        temp.transform.rotation = Quaternion.FromToRotation(Vector3.down, -position.normalized);
+        temp.transform.Rotate(0.0f, Random.Range(0, 360), 0.0f, Space.Self);
+        temp.transform.parent = parent.transform;
+        Instantiate(temp);
     }
 
     public struct ObjectLocations

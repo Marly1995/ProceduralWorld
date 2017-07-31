@@ -11,6 +11,9 @@ public class playerMovement : MonoBehaviour {
     Vector3 moveAmount;
     Vector3 smoothMoveVelocity;
     Rigidbody rb;
+
+    public GameObject shipRotation;
+    public GameObject coreRotation;
         
 	// Use this for initialization
 	void Start () {
@@ -20,9 +23,14 @@ public class playerMovement : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         Vector3 moveDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
+        Vector3 newDir = new Vector3(Input.GetAxisRaw("hRight"), 0, -Input.GetAxisRaw("vRight")).normalized;
         if (moveDir.magnitude >= 0.2)
         {
-            currentSpeed = currentSpeed >= maxSpeed ? currentSpeed : currentSpeed + acceleration;
+            Vector3 diff = newDir - moveDir;
+            diff *= 0.25f * maxSpeed;
+            float speedMax = maxSpeed - diff.magnitude;
+            currentSpeed = currentSpeed >= maxSpeed ? speedMax : currentSpeed + acceleration;
+            Debug.Log(currentSpeed);
         }
         else
         {

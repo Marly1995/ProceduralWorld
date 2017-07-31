@@ -10,7 +10,7 @@ public class playerRotation : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        Vector3 newDir = transform.parent.transform.right * Input.GetAxisRaw("Horizontal") + transform.parent.transform.forward * Input.GetAxisRaw("Vertical");
+        Vector3 newDir = transform.parent.transform.right * Input.GetAxisRaw("hRight") + -transform.parent.transform.forward * Input.GetAxisRaw("vRight");
         if (newDir != Vector3.zero)
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(newDir, transform.up), 0.075f);
