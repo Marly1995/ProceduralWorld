@@ -6,7 +6,8 @@ using UnityEngine;
 
 public class IslandGenerator : MonoBehaviour {
 
-    //public Material sea;
+    public LPWAsset.LowPolyWaterScript waterScript;
+    public Material sea;
     public enum DrawMode { NoiseMap, ColorMap, Mesh, Sphere };
     public DrawMode drawMode;
 
@@ -193,19 +194,20 @@ public class IslandGenerator : MonoBehaviour {
     {
         int coln = UnityEngine.Random.Range(0, 6);
         Color col = colMan.colors[coln];
+        Color water = colMan.compliments[coln];
         col.a = 1.0f;
         for (int i = 0; i < regions.Length; i++)
         {
-            col.r += UnityEngine.Random.Range(0.2f, 0.4f)-0.4f;
-            col.g += UnityEngine.Random.Range(0.2f, 0.4f)-0.4f;
-            col.b += UnityEngine.Random.Range(0.2f, 0.4f)-0.4f;
+            //col.r += UnityEngine.Random.Range(0.2f, 0.4f)-0.4f;
+            //col.g += UnityEngine.Random.Range(0.2f, 0.4f)-0.4f;
+            //col.b += UnityEngine.Random.Range(0.2f, 0.4f)-0.4f;
             col.a -= 0.1f;
             regions[i].color = col;
             regions[i].iceColor = regions[i].color;
         }
-        Color tcol = colMan.compliments[coln];
-        tcol.a = 0.3f;
-        //sea.color = tcol;
+        sea.SetColor("_Color", water);
+        sea.SetColor("_DeepColor", water);
+        waterScript.material = sea;
     }
 
     public void RandomizeHeights()

@@ -19,7 +19,7 @@ public class InputManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetKey("a"))
+		if (Input.GetKey(KeyCode.Space))
         {
             int index = Random.Range(0, generators.Length - 1);
             GenerateRandom(index);
@@ -46,7 +46,7 @@ public class InputManager : MonoBehaviour {
 
     void SetPlayerLocation()
     {
-        player.transform.position = new Vector3(6, 50, 0);
+        //player.transform.position = new Vector3(6, 50, 0);
     }
 
     void PopulateEnemys()
