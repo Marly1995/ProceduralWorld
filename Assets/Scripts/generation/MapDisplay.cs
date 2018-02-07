@@ -41,7 +41,7 @@ public class MapDisplay : MonoBehaviour {
             //seaMeshRenderer[i].sharedMaterial = new Material(Shader.Find("FX/Water"));
             //seaMeshRenderer[i].sharedMaterial.mainTexture = segments[i].texture;
         }
-		world.Populate(segments);
+		//world.Populate(segments);
 	}
 
     public void DrawTerrain(TerrainData terrainData)
