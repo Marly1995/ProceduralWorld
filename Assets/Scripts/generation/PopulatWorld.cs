@@ -62,7 +62,7 @@ public class PopulatWorld : MonoBehaviour {
 				for (int y = 0; y < gridSize; y++) 
 				{
                     // PINE TREES
-                    if (objectLocations[i].height[x, y] >= 10.001f &&
+                    if (objectLocations[i].height[x, y] >= 10.35f &&
                         objectLocations[i].height[x, y] <= 11.8f)
                     {
                         if (rockCount <= 0)

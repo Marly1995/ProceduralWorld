@@ -198,9 +198,9 @@ public class IslandGenerator : MonoBehaviour {
         col.a = 1.0f;
         for (int i = 0; i < regions.Length; i++)
         {
-            //col.r += UnityEngine.Random.Range(0.2f, 0.4f)-0.4f;
-            //col.g += UnityEngine.Random.Range(0.2f, 0.4f)-0.4f;
-            //col.b += UnityEngine.Random.Range(0.2f, 0.4f)-0.4f;
+            col.r += UnityEngine.Random.Range(0.2f, 0.4f)-0.4f;
+            col.g += UnityEngine.Random.Range(0.2f, 0.4f)-0.4f;
+            col.b += UnityEngine.Random.Range(0.2f, 0.4f)-0.4f;
             col.a -= 0.1f;
             regions[i].color = col;
             regions[i].iceColor = regions[i].color;
@@ -212,8 +212,8 @@ public class IslandGenerator : MonoBehaviour {
 
     public void RandomizeHeights()
     {
-        float half = meshHeightmultiplier / 2;
-        meshHeightmultiplier = UnityEngine.Random.Range(meshHeightmultiplier-half, meshHeightmultiplier+half);
+        //float half = meshHeightmultiplier / 2;
+        //meshHeightmultiplier = UnityEngine.Random.Range(meshHeightmultiplier-half, meshHeightmultiplier+half);
     }
 
     void OnValidate()
