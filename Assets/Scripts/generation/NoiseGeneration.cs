@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using LibNoise;
+using LibNoise.Generator;
+using LibNoise.Operator;
+
 public static class NoiseGeneration
 {
     public enum NormailizeMode { Local, Global };
@@ -82,5 +86,30 @@ public static class NoiseGeneration
             }
         }
         return noiseMap;
+    }
+
+    public static float[,] GenerateLibNoiseMap(int mapWidth, int mapHeight, int seed, float scale, int sheets, float persistance, float lacunarity, Vector2 offset, float voronoi, float perlin, float ridged, float billow)
+    {
+        Const rmfConst = new Const(ridged);
+        RidgedMultifractal rmf = new RidgedMultifractal(scale, lacunarity, sheets, seed, QualityMode.High);
+
+        Const billConst = new Const(billow);
+        Billow bill = new Billow(scale, lacunarity, persistance, sheets, seed, QualityMode.High);
+
+        Const vorConst = new Const(voronoi);
+        Voronoi vor = new Voronoi(scale, 1f, seed, true);
+
+        Const perlinConst = new Const(perlin);
+        Perlin per = new Perlin(scale, lacunarity, persistance, sheets, seed, QualityMode.High);
+        
+        var gen1 = new Add(new Multiply(per, perlinConst), new Multiply(vor, vorConst));
+        var gen2 = new Add(new Multiply(rmf, rmfConst), new Multiply(bill, billConst));
+        var finalGenerator = new Add(gen1, gen2);
+
+        Noise2D noiseGenerator = new Noise2D(mapWidth, mapHeight, finalGenerator);
+
+        noiseGenerator.GeneratePlanar(0f, 1f, 0f, 1f);
+
+        return noiseGenerator.GetData();
     }
 }

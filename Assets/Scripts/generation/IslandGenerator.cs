@@ -6,6 +6,12 @@ using UnityEngine;
 
 public class IslandGenerator : MonoBehaviour {
 
+    public float perlin = 0.25f;
+    public float billow = 0.25f;
+    public float voronoi = 0.25f;
+    public float rmf = 0.25f;
+
+    [Space]
     public LPWAsset.LowPolyWaterScript waterScript;
     public Material sea;
     public enum DrawMode { NoiseMap, ColorMap, Mesh, Sphere };
@@ -133,7 +139,7 @@ public class IslandGenerator : MonoBehaviour {
 
     MapData GenerateMapData(Vector2 centre, int Size)
     {
-        float[,] noiseMap = NoiseGeneration.GenerateNoiseMap(Size, Size, seed, noiseScale, sheets, persistance, lacunarity, centre + offset);
+        float[,] noiseMap = NoiseGeneration.GenerateLibNoiseMap(Size, Size, seed, noiseScale, sheets, persistance, lacunarity, centre + offset, voronoi, perlin, rmf, billow);
         float[,] islandMap = new float[Size, Size];
 		float[,] fallMap = FalloffGenerator.GenerateFalloff((halfIslandSize*2)+1, islandFallof_a, islandFalloff_b);
         List<Vector2> islands = new List<Vector2>();
