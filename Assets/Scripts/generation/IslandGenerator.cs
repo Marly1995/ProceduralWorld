@@ -139,7 +139,7 @@ public class IslandGenerator : MonoBehaviour {
 
     MapData GenerateMapData(Vector2 centre, int Size)
     {
-        float[,] noiseMap = NoiseGeneration.GenerateLibNoiseMap(Size, Size, seed, noiseScale, sheets, persistance, lacunarity, centre + offset, voronoi, perlin, rmf, billow);
+        float[,] noiseMap = NoiseGeneration.GenerateNoiseMap(Size, Size, seed, noiseScale, sheets, persistance, lacunarity, centre + offset);
         float[,] islandMap = new float[Size, Size];
 		float[,] fallMap = FalloffGenerator.GenerateFalloff((halfIslandSize*2)+1, islandFallof_a, islandFalloff_b);
         List<Vector2> islands = new List<Vector2>();

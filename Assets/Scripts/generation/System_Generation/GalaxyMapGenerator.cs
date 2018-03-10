@@ -14,7 +14,6 @@ public class GalaxyMapGenerator : MonoBehaviour {
     public int stepMin;
     public float distance;
 
-    int[,] map;
     List<Vector2> planets;
     int m_step;
 
@@ -25,7 +24,6 @@ public class GalaxyMapGenerator : MonoBehaviour {
             galaxy = newGalaxy;
             planets = new List<Vector2>();
             m_step = Random.Range(stepMin, stepMax);
-            map = new int[width, height];
             GenerateGalaxy();
             DisplayGalaxy();
         }
@@ -36,7 +34,6 @@ public class GalaxyMapGenerator : MonoBehaviour {
         newGalaxy = galaxy;
         planets = new List<Vector2>();
         m_step = Random.Range(stepMin, stepMax);
-        map = new int[width, height];
         GenerateGalaxy();
         DisplayGalaxy();
     }
