@@ -34,8 +34,8 @@ public class MapDisplay : MonoBehaviour {
             meshRenderer[i].sharedMaterial = new Material(Shader.Find("Diffuse With Shadows"));
             meshRenderer[i].sharedMaterial.mainTexture = segments[i].texture;
             
-            colliderMesh[i].sharedMesh = segments[i].collider;
-            meshCollider[i].sharedMesh = segments[i].collider;
+            //colliderMesh[i].sharedMesh = segments[i].collider;
+            //meshCollider[i].sharedMesh = segments[i].collider;
 
             //seaMeshFilter[i].sharedMesh = segments[i].mesh;
             //seaMeshRenderer[i].sharedMaterial = new Material(Shader.Find("FX/Water"));
