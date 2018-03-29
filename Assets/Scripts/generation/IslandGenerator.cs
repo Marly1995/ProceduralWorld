@@ -63,7 +63,7 @@ public class IslandGenerator : MonoBehaviour {
     public bool randomColors;
     public bool randomize;
 
-    public TerrainType[] regions;
+    public SeamLessTerrainData[] regions;
 	float[,] falloffMap;
 
     public ColorManager colMan;
@@ -253,7 +253,7 @@ public class IslandGenerator : MonoBehaviour {
 }
 
 [System.Serializable]
-public struct TerrainType
+public struct SeamLessTerrainData
 {
     public string name;
     [Range(0, 1)]

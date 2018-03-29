@@ -32,6 +32,6 @@ public class GenerationData
     [Range(4, 250)]
     public int halfIslandSize;
 
-    public TerrainType[] regions;
+    public SeamLessTerrainData[] regions;
     float[,] falloffMap;
 }

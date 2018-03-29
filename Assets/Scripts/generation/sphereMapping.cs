@@ -7,14 +7,14 @@ using UnityEngine;
 public class sphereMapping : MonoBehaviour
 {
 
-    public static SegmentData[] getSphere(int divs, int gridSize, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve, TerrainType[] regions, bool useFlatShading)
+    public static SegmentData[] getSphere(int divs, int gridSize, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve, SeamLessTerrainData[] regions, bool useFlatShading)
     {
         float radius = 10.0f;
 
         return Generate(divs, gridSize, radius, heightMap, heightMultiplier, _heightCurve, regions, useFlatShading);
     }
 
-    public static SegmentData[] Generate(int divs, int gridSize, float radius, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve, TerrainType[] regions, bool useFlatShading)
+    public static SegmentData[] Generate(int divs, int gridSize, float radius, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve, SeamLessTerrainData[] regions, bool useFlatShading)
     {
         SegmentData[] segments = GenerateVerts(divs, gridSize, radius, heightMap, heightMultiplier, _heightCurve, regions);
 
@@ -51,7 +51,7 @@ public class sphereMapping : MonoBehaviour
         return segments;
     }
 
-    private static SegmentData[] GenerateVerts(int divs, int gridSize, float radius, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve, TerrainType[] regions)
+    private static SegmentData[] GenerateVerts(int divs, int gridSize, float radius, MapData[] heightMap, float heightMultiplier, AnimationCurve _heightCurve, SeamLessTerrainData[] regions)
     {
         SegmentData[] segments = new SegmentData[divs * 6];
         int inc = (int)Mathf.Pow(divs, 0.5f);
@@ -113,7 +113,7 @@ public class sphereMapping : MonoBehaviour
         return segments;
     }
 
-    private static SegmentData XyPlane(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, TerrainType[] regions, int yStart, int xStart, int z)
+    private static SegmentData XyPlane(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, SeamLessTerrainData[] regions, int yStart, int xStart, int z)
     {
         Mesh mesh = new Mesh();
         Vector3[] vertices = new Vector3[(gridSize + 1) * (gridSize + 1)];
@@ -161,7 +161,7 @@ public class sphereMapping : MonoBehaviour
         return segment;
     }
 
-    private static SegmentData XzPlane(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, TerrainType[] regions, int zStart, int xStart, int y)
+    private static SegmentData XzPlane(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, SeamLessTerrainData[] regions, int zStart, int xStart, int y)
     {
         Mesh mesh = new Mesh();
         Vector3[] vertices = new Vector3[(gridSize + 1) * (gridSize + 1)];
@@ -212,7 +212,7 @@ public class sphereMapping : MonoBehaviour
         return segment;
     }
 
-    private static SegmentData ZyPlane(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, TerrainType[] regions, int yStart, int zStart, int x)
+    private static SegmentData ZyPlane(int inc, int gridSize, float radius, float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, SeamLessTerrainData[] regions, int yStart, int zStart, int x)
     {
         Mesh mesh = new Mesh();
         Vector3[] vertices = new Vector3[(gridSize + 1) * (gridSize + 1)];
