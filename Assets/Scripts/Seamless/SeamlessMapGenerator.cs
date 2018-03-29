@@ -39,6 +39,10 @@ public class SeamlessMapGenerator : MonoBehaviour
     public SeamlessTerrainType[] regions;
     [HideInInspector]
     public int seedValue;
+
+    [SerializeField]
+    Texture2D planettessmap;
+    Material planetMaterial;
     #endregion
 
     #region Private / Hidden values
@@ -118,9 +122,15 @@ public class SeamlessMapGenerator : MonoBehaviour
             noiseMap.GenerateSpherical(-90, 90, -180, 180);
             Color[] colorMap = new Color[noiseMap.Width * noiseMap.Height];
             textures[0] = new Texture2D(noiseMap.Width, noiseMap.Height);
+
+            // apply hgihtmap based on greyscale map
+
+            planettessmap = noiseMap.GetTexture(GradientPresets.Grayscale);
+
             if (renderType == RenderType.Greyscale)
             {
                 textures[0] = noiseMap.GetTexture(GradientPresets.Grayscale);
+                planetMaterial.SetTexture("_DispTex", textures[0]);
             }
             else
             {
@@ -145,11 +155,10 @@ public class SeamlessMapGenerator : MonoBehaviour
             }
             textures[0].Apply();
 
-            Mesh newMesh = SphereMagic.CreatePlanet(PlanetItterations, radius, baseModule, heightMultiplier, regions);
-            
-            display.DrawMesh(newMesh, textures[0]);
+            // spply color map to material
 
-
+            planetMaterial.SetTexture("_DispTex", planettessmap);
+            planetMaterial.SetTexture("_MainTex", textures[0]);
         }
         #endregion
 
