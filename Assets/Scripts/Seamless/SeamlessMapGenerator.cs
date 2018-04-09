@@ -42,6 +42,7 @@ public class SeamlessMapGenerator : MonoBehaviour
 
     [SerializeField]
     Texture2D planettessmap;
+    [SerializeField]
     Material planetMaterial;
     #endregion
 
@@ -156,7 +157,6 @@ public class SeamlessMapGenerator : MonoBehaviour
             textures[0].Apply();
 
             // spply color map to material
-
             planetMaterial.SetTexture("_DispTex", planettessmap);
             planetMaterial.SetTexture("_MainTex", textures[0]);
         }
