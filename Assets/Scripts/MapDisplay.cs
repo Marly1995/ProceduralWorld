@@ -10,6 +10,8 @@ public class MapDisplay : MonoBehaviour {
 
     public Terrain terrain;
 
+    public Shader shader;
+
     public void DrawTexture(Texture2D texture)
     {
         textureRenderer.sharedMaterial.mainTexture = texture;
@@ -27,8 +29,8 @@ public class MapDisplay : MonoBehaviour {
         for (int i = 0; i < segments.Length; i++)
         {
             meshFilter[i].sharedMesh = segments[i].mesh;
-            meshRenderer[i].sharedMaterial = new Material(Shader.Find("Standard"));
-            meshRenderer[i].sharedMaterial.mainTexture = segments[i].texture;
+            meshRenderer[i].sharedMaterial = new Material(shader);
+            meshRenderer[i].sharedMaterial.SetTexture("_MainTex", segments[i].texture);
         }
 		PopulatWorld world = FindObjectOfType<PopulatWorld> ();
 		world.Populate (segments);
